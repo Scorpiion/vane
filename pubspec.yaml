@@ -1,0 +1,10 @@
+name: vane
+version: 0.2.1
+author: Robert Åkerblom-Andersson <Robert@dartvoid.com>
+description: Vane is a class based server side framework.
+homepage: http://dartvoid.com/vane/
+documentation: http://dartvoid.com/docs/vaneapi/
+dependencies:
+  http_server: '>=0.9.1 <0.10.0'
+  logging: '>=0.9.1+1 <0.10.0'
+  mongo_dart: '>=0.1.38 <0.2.0'
