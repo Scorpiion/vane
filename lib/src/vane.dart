@@ -248,9 +248,29 @@ class Vane {
   ///     
   HttpSession get session => _core.req._req.session; 
   
+  /// Path paramters
+  /// 
+  /// Parsed decoded path paramters from the request. 
+  /// 
+  /// Example:
+  ///     class PathTestClass extends Vane {
+  ///       Future main() {
+  ///         print('Hello ${path[0]}');
+  ///         write('Hello ${path[0]}');
+  ///         return close();
+  ///       }
+  ///     }
+  ///     
+  /// Test url:
+  ///     curl http://[appname].[user].dartblob.com/[handler]/[yourName]
+  ///     
+  /// Note: This is a shorthand for req.uri.pathSegments
+  ///     
+  List<String> get path => _core.req.uri.pathSegments;
+  
   /// Query paramters
   /// 
-  /// Parsed query paramters from the request. 
+  /// Parsed decoded query paramters from the request. 
   /// 
   /// Example:
   ///     class QueryTestClass extends Vane {
