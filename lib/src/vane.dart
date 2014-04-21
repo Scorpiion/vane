@@ -771,7 +771,7 @@ class Vane {
   /// [call] should never be override or called from within a handler. It is  
   /// only used by the server serving the handler.
   /// 
-  void call(HttpRequest request) {
+  void call(HttpRequest request, [Future handler()]) {
     // Initilize Vane core
     _core.req = new VaneRequest(request);
     _core.res = new VaneResponse(request.response);
@@ -787,8 +787,12 @@ class Vane {
       // Run registed preHook middleware
       var middle = _runMiddleware(_core, pre).then((res) {
         if(res == _NEXT_MIDDLEWARE) {
-          // Run main
-          return main();
+          // Run default handler 'main' or user provided handler 'handler' 
+          if(handler == null) {
+            return main();
+          } else {
+            return handler();
+          }
         } else {
           // Don't run main and just forward r if middleware returns with [ok]
           return res;
