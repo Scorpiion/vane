@@ -1,3 +1,8 @@
+### 0.3.0
+
+* Added support so that the user can choose a different handler function than main, main is still default but a different handler can be choosed, hence the same object can be registred on multiple different paths, now it's for example possible to map all GET request to one method and all POST request to a different one. Before you had to have two seperate classes.
+* Added new shorthand for pathSegments called path. Similar to query, json, params and etc. Using pathSegments seems common enough and the default way to get it is complex enough compared to other parts of vane to be worth a shorthand.
+
 ### 0.2.1+1
 
 * Moved Vane's code to a [public Github repo](https://github.com/DartVoid/Vane) 
