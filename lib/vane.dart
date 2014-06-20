@@ -6,7 +6,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:collection';
-import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler;
+import 'dart:mirrors';
+import 'package:uri/uri.dart';
+import 'package:path/path.dart' as path;
+import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler, VirtualDirectory;
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db;
 
@@ -17,6 +20,13 @@ part 'src/vane.dart';
 part 'src/session_manager.dart';
 part 'src/outputConsumer.dart';
 part 'src/tube.dart';
+
+part 'src/parse_pipeline.dart';
+part 'src/router.dart';
+part 'src/serve.dart';
+part 'src/annotations.dart';
+part 'src/getControllerMirrors.dart';
+part 'src/generateRoutes.dart';
 
 part 'middleware/log.dart';
 part 'middleware/cors.dart';
