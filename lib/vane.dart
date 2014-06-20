@@ -25,8 +25,8 @@ part 'src/parse_pipeline.dart';
 part 'src/router.dart';
 part 'src/serve.dart';
 part 'src/annotations.dart';
-part 'src/getControllerMirrors.dart';
-part 'src/generateRoutes.dart';
+part 'src/get_controller_mirrors.dart';
+part 'src/generate_routes.dart';
 
 part 'middleware/log.dart';
 part 'middleware/cors.dart';
