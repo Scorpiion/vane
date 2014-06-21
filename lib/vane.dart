@@ -18,7 +18,7 @@ part 'src/res.dart';
 part 'src/vane_core.dart';
 part 'src/vane.dart';
 part 'src/session_manager.dart';
-part 'src/outputConsumer.dart';
+part 'src/output_consumer.dart';
 part 'src/tube.dart';
 
 part 'src/parse_pipeline.dart';
