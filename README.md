@@ -13,24 +13,18 @@ return to the client by running `close()`.
 
 ### Hello World
 ```dart
-import 'dart:io';
 import 'dart:async';
 import 'package:vane/vane.dart';
 
-void main() {
-  HttpServer.bind('127.0.0.1', 8080).then((server) {
-    server.listen((req) => new HelloWorld()(req));
-  });
+class HelloWorld extends Vane {
+  @Route("/{user}")
+  Future User(String user) => close("Hello ${user}");
+
+  @Route("/")
+  Future World() => close("Hello world");
 }
 
-class HelloWorld extends Vane { 
-  Future main() {
-    print("Hello world to the server console!");
-    write("Hello world to the client browser!");
-    
-    return close();
-  }
-}
+void main() => serve();
 ```
 
 ### Summary
