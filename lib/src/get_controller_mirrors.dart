@@ -10,7 +10,6 @@ List<ClassMirror> getControllerMirrors() {
 
   for(var controller in declarations.values.where((controller) =>
       controller is ClassMirror && controller.isSubclassOf(VaneMirror))) {
-
     bool added = false;
     Map<String, String> pathParams;
     UriParser uriParser;

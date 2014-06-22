@@ -13,6 +13,23 @@ class Vane {
   /// Completer used internally with middlware
   Completer _vaneCompleter = new Completer();
 
+  /// Internal variable used for pipeline placement, see [pFirst], [pLast],
+  /// [pIndex] for read only version available to users.
+  bool _last = false;
+  bool _first = false;
+  int _index = 0;
+
+  /// [pFirst] returns [true] if and only if controller is first in the
+  /// pipeline.
+  bool get pFirst => _first;
+
+  /// [pLast] returns [true] if and only if controller is last in the
+  /// pipeline.
+  bool get pLast => _last;
+
+  /// [pIndex] returns the index that [this] controller has inside the pipeline.
+  int get pIndex => _index;
+
   /// VaneRequest
   ///
   /// Request object that contains paramters from the incomming request.
@@ -752,6 +769,12 @@ class Vane {
   ///     }
   ///
   Future next([Object data]) {
+    // If this middleware is last in the pipeline, change [next] call to [close]
+    // call instead since we otherwise hang the request.
+    if(_last == true) {
+      return close(data);
+    }
+
     // If data is present, write to ouputStream
     if(data != null) {
       // JSON encode the data if it is of type List or Map, else write it as it is

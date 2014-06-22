@@ -50,13 +50,44 @@ class Router {
     print("Serving request ${match.match.input} with handler ${match.matchedRoute.name}.${match.matchedHandler.name}");
 
     // Create new instance of controller
-    var ob = match.matchedRoute.mirror.newInstance(const Symbol(""), []);
+    var controller = match.matchedRoute.mirror.newInstance(const Symbol(""), []);
 
-    // Setup pipeline
-    match.matchedRoute.pre.forEach((middlewareMirror) =>
-        ob.reflectee.pre.add(middlewareMirror.newInstance(const Symbol(""), []).reflectee));
-    match.matchedRoute.post.forEach((middlewareMirror) =>
-        ob.reflectee.post.add(middlewareMirror.newInstance(const Symbol(""), []).reflectee));
+    // Pipeline index
+    int pIndex = 0;
+
+    // Setup pre middlewares and their pipeline variables
+    for(var i = 0; i < match.matchedRoute.pre.length; i++) {
+      controller.reflectee.pre.add(match.matchedRoute.pre[i].newInstance(const Symbol(""), []).reflectee);
+
+      // Setup pipeline variables
+      controller.reflectee.pre[i]._index = pIndex;
+      if(i == 0) {
+        controller.reflectee.pre[i]._first = true;
+      }
+      pIndex++;
+    }
+
+    // Setup pipeline variables for main controller
+    controller.reflectee._index = pIndex;
+    if(pIndex == 0) {
+      controller.reflectee._first = true;
+    }
+    if(pIndex == (match.matchedRoute.post.length + match.matchedRoute.pre.length)) {
+      controller.reflectee._last = true;
+    }
+    pIndex++;
+
+    // Setup post middlewares and their pipeline variables
+    for(var i = 0; i < match.matchedRoute.post.length; i++) {
+      controller.reflectee.post.add(match.matchedRoute.post[i].newInstance(const Symbol(""), []).reflectee);
+
+      // Setup pipeline variables
+      controller.reflectee.post[i]._index = pIndex;
+      if(i == (match.matchedRoute.post.length - 1)) {
+        controller.reflectee.post[i]._last = true;
+      }
+      pIndex++;
+    }
 
     // Setup paramters
     List<String> handlerParams = new List();
@@ -69,10 +100,10 @@ class Router {
     }
 
     // Get handler function
-    var handler = ob.getField(new Symbol(match.matchedHandler.name));
+    var handler = controller.getField(new Symbol(match.matchedHandler.name));
 
     // Run handler
-    ob.invoke(new Symbol("call"), [request, handler.reflectee, handlerParams]);
+    controller.invoke(new Symbol("call"), [request, handler.reflectee, handlerParams]);
   }
 }
 
