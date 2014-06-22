@@ -9,7 +9,7 @@ void serve() {
   runZoned(() {
     // Server port assignment
     var portEnv = Platform.environment['PORT'];
-    var port = portEnv != null ? int.parse(portEnv) : 8081;
+    var port = portEnv != null ? int.parse(portEnv) : 8080;
     VirtualDirectory serveClient;
 
     // Start client handler
