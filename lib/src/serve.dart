@@ -5,9 +5,6 @@ part of vane;
 void serve() {
   Router router = new Router();
 
-  var appRoot = path.current;
-  appRoot = "/home/robert/dv-workplace/Vane-Hello-World";
-
   // Setup logger
   Logger.root.level = Level.CONFIG;
   Logger.root.onRecord.listen((LogRecord rec) {
@@ -25,14 +22,7 @@ void serve() {
   runZoned(() {
     // Server port assignment
     var portEnv = Platform.environment['PORT'];
-    var port = portEnv != null ? int.parse(portEnv) : 8080;
-    VirtualDirectory serveClient;
-
-    // Start client handler
-    if(portEnv == null) {
-      serveClient = new VirtualDirectory(appRoot)
-      ..allowDirectoryListing = false;
-    }
+    var port = portEnv != null ? int.parse(portEnv) : 9090;
 
     Logger.root.info("Starting vane server: 127.0.0.1:${port}");
 
@@ -40,10 +30,6 @@ void serve() {
       RouteMatch match;
 
       server.listen((HttpRequest request) {
-        // Check if path matches any static code first...
-        // Then proxy request to subprocess running pub serve
-//        serveClient.serveRequest(request);
-
         // See if we have a match for the request
         match = router.matchRequest(request);
         if(match.match != null) {
@@ -58,9 +44,9 @@ void serve() {
     });
   },
   onError: (e, stackTrace) {
-    Logger.root.warning(e);
+    Logger.root.warning(e.toString());
     Logger.root.warning("\n");
-    Logger.root.warning(stackTrace);
+    Logger.root.warning(stackTrace.toString());
   });
 }
 
