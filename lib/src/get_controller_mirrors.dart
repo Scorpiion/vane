@@ -1,3 +1,5 @@
+// Copyright (c) 2014, Robert Åkerblom-Andersson <Robert@dartvoid.com>
+
 part of vane;
 
 List<ClassMirror> getControllerMirrors() {
@@ -8,39 +10,32 @@ List<ClassMirror> getControllerMirrors() {
   ClassMirror VaneMirror = reflectClass(Vane);
   InstanceMirror RouteMirror = reflect(Route);
 
-  for(var controller in declarations.values.where((controller) =>
-      controller is ClassMirror && controller.isSubclassOf(VaneMirror))) {
-    bool added = false;
-    Map<String, String> pathParams;
-    UriParser uriParser;
-
-    if(controller is ClassMirror && controller.isSubclassOf(VaneMirror)) {
+  for(var mirror in declarations.values) {
+    if(mirror is ClassMirror && mirror.isSubclassOf(VaneMirror)) {
       // Check if the class have a @Route annotation
-      if(controller.metadata.any((meta) => meta.reflectee is Route) == true) {
+      if(mirror.metadata.any((meta) => meta.reflectee is Route) == true) {
 //        print("Adding controller ${realname(controller)}");
-        controllers.add(controller);
-        added = true;
+        controllers.add(mirror);
       } else {
         // If the class did not have a @Route annotation, check if any member
         // methods do. First sort out valid methods for @Route then check if
         // @Route is present.
-        for(var method in controller.declarations.values.where((mirror)
-            => mirror is MethodMirror && mirror.isRegularMethod)) {
+        for(var method in mirror.declarations.values.where((method)
+            => method is MethodMirror && method.isRegularMethod)) {
 
           // Check if the method have a @Route annotation
           if(method.metadata.any((meta) => meta.reflectee is Route) == true) {
 //            print("Adding controller ${realname(controller)}");
-            controllers.add(controller);
-            added = true;
+            controllers.add(mirror);
           }
         }
       }
 
-    } else if(controller is ClassMirror) {
+    } else if(mirror is ClassMirror) {
       // PODO controllers
 //      print("Podo controller: ${controller.simpleName}");
 
-    } else if(controller is MethodMirror) {
+    } else if(mirror is MethodMirror) {
       // Func controllers
 //      print("Func controller: ${controller.simpleName}");
 
