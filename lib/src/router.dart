@@ -10,12 +10,12 @@ class RouteMatch {
 }
 
 class Router {
-  List<ClassMirror> controllerMirrors;
+  Controllers controllers;
   List<_VaneRoute> routes;
 
   Router() {
-    controllerMirrors = getControllerMirrors();
-    routes = generateRoutes(controllerMirrors);
+    controllers = scanControllers();
+    routes = generateRoutes(controllers);
   }
 
   RouteMatch matchRequest(HttpRequest request) {
@@ -49,50 +49,11 @@ class Router {
   }
 
   void serve(HttpRequest request, RouteMatch match) {
-    print("Serving request ${match.match.input} with handler ${match.matchedRoute.name}.${match.matchedHandler.name}");
-
-    // Create new instance of controller
-    var controller = match.matchedRoute.mirror.newInstance(const Symbol(""), []);
-
-    // Pipeline index
-    int pIndex = 0;
-
-    // Setup pre middlewares and their pipeline variables
-    for(var i = 0; i < match.matchedRoute.pre.length; i++) {
-      controller.reflectee.pre.add(match.matchedRoute.pre[i].newInstance(const Symbol(""), []).reflectee);
-
-      // Setup pipeline variables
-      controller.reflectee.pre[i]._index = pIndex;
-      if(i == 0) {
-        controller.reflectee.pre[i]._first = true;
-      }
-      pIndex++;
-    }
-
-    // Setup pipeline variables for main controller
-    controller.reflectee._index = pIndex;
-    if(pIndex == 0) {
-      controller.reflectee._first = true;
-    }
-    if(pIndex == (match.matchedRoute.post.length + match.matchedRoute.pre.length)) {
-      controller.reflectee._last = true;
-    }
-    pIndex++;
-
-    // Setup post middlewares and their pipeline variables
-    for(var i = 0; i < match.matchedRoute.post.length; i++) {
-      controller.reflectee.post.add(match.matchedRoute.post[i].newInstance(const Symbol(""), []).reflectee);
-
-      // Setup pipeline variables
-      controller.reflectee.post[i]._index = pIndex;
-      if(i == (match.matchedRoute.post.length - 1)) {
-        controller.reflectee.post[i]._last = true;
-      }
-      pIndex++;
-    }
+    InstanceMirror vaneController;
+    InstanceMirror podoController;
+    List<String> handlerParams = new List<String>();
 
     // Setup paramters
-    List<String> handlerParams = new List();
     for(var i = 0; i < match.matchedHandler.parameters.length; i++) {
       if(match.match.parameters.keys.contains(match.matchedHandler.parameters[i])) {
         handlerParams.add(match.match.parameters[match.matchedHandler.parameters[i]]);
@@ -101,11 +62,135 @@ class Router {
       }
     }
 
-    // Get handler function
-    var handler = controller.getField(new Symbol(match.matchedHandler.name));
+    // Setup controller specific settings and invoke controller
+    switch(match.matchedRoute.type) {
+      case _vane:
+        print("Serving request ${match.match.input} with vane handler ${match.matchedRoute.name}.${match.matchedHandler.name}");
 
-    // Run handler
-    controller.invoke(new Symbol("call"), [request, handler.reflectee, handlerParams]);
+        // Create new instance of vane controller
+        vaneController = match.matchedRoute.classMirror.newInstance(const Symbol(""), []);
+
+        // Pipeline index
+        int pIndex = 0;
+
+        // Setup pre middlewares and their pipeline variables
+        for(var i = 0; i < match.matchedRoute.pre.length; i++) {
+          vaneController.reflectee.pre.add(match.matchedRoute.pre[i].newInstance(const Symbol(""), []).reflectee);
+
+          // Setup pipeline variables
+          vaneController.reflectee.pre[i]._index = pIndex;
+          if(i == 0) {
+            vaneController.reflectee.pre[i]._first = true;
+          }
+          pIndex++;
+        }
+
+        // Setup pipeline variables for main controller
+        vaneController.reflectee._index = pIndex;
+        if(pIndex == 0) {
+          vaneController.reflectee._first = true;
+        }
+        if(pIndex == (match.matchedRoute.post.length + match.matchedRoute.pre.length)) {
+          vaneController.reflectee._last = true;
+        }
+        pIndex++;
+
+        // Setup post middlewares and their pipeline variables
+        for(var i = 0; i < match.matchedRoute.post.length; i++) {
+          vaneController.reflectee.post.add(match.matchedRoute.post[i].newInstance(const Symbol(""), []).reflectee);
+
+          // Setup pipeline variables
+          vaneController.reflectee.post[i]._index = pIndex;
+          if(i == (match.matchedRoute.post.length - 1)) {
+            vaneController.reflectee.post[i]._last = true;
+          }
+          pIndex++;
+        }
+
+        // Get handler function
+        var handler = vaneController.getField(new Symbol(match.matchedHandler.name));
+
+        // Run handler
+        vaneController.invoke(new Symbol("call"), [request, handler.reflectee, handlerParams]);
+
+        break;
+
+      case _podo:
+        print("Serving request ${match.match.input} with podo handler ${match.matchedRoute.name}.${match.matchedHandler.name}");
+
+        // Create new instance of podo controller
+        podoController = match.matchedRoute.classMirror.newInstance(const Symbol(""), []);
+
+        // Run handler (-1 because of the HttpRequest that is always present)
+        switch(handlerParams.length - 1) {
+          case 0 : podoController.invoke(new Symbol(match.matchedHandler.name), [request]); break;
+          case 1 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1]]); break;
+          case 2 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2]]); break;
+          case 3 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3]]); break;
+          case 4 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4]]); break;
+          case 5 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5]]); break;
+          case 6 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6]]); break;
+          case 7 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7]]); break;
+          case 8 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8]]); break;
+          case 9 : podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9]]); break;
+          case 10: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10]]); break;
+          case 11: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11]]); break;
+          case 12: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12]]); break;
+          case 13: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13]]); break;
+          case 14: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14]]); break;
+          case 15: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15]]); break;
+          case 16: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16]]); break;
+          case 17: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17]]); break;
+          case 18: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18]]); break;
+          case 19: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19]]); break;
+          case 20: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20]]); break;
+          case 21: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21]]); break;
+          case 22: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22]]); break;
+          case 23: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23]]); break;
+          case 24: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24]]); break;
+          case 25: podoController.invoke(new Symbol(match.matchedHandler.name), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24], handlerParams[25]]); break;
+        }
+
+        break;
+
+      case _func:
+        print("Serving request ${match.match.input} with func handler ${match.matchedHandler.name}");
+
+        // Run handler (-1 because of the HttpRequest that is always present)
+        switch(handlerParams.length - 1) {
+          case 0 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request]); break;
+          case 1 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1]]); break;
+          case 2 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2]]); break;
+          case 3 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3]]); break;
+          case 4 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4]]); break;
+          case 5 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5]]); break;
+          case 6 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6]]); break;
+          case 7 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7]]); break;
+          case 8 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8]]); break;
+          case 9 : (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9]]); break;
+          case 10: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10]]); break;
+          case 11: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11]]); break;
+          case 12: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12]]); break;
+          case 13: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13]]); break;
+          case 14: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14]]); break;
+          case 15: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15]]); break;
+          case 16: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16]]); break;
+          case 17: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17]]); break;
+          case 18: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18]]); break;
+          case 19: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19]]); break;
+          case 20: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20]]); break;
+          case 21: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21]]); break;
+          case 22: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22]]); break;
+          case 23: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23]]); break;
+          case 24: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24]]); break;
+          case 25: (match.matchedRoute.funcMirror.owner as LibraryMirror).invoke(match.matchedRoute.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24], handlerParams[25]]); break;
+        }
+
+        break;
+
+      default:
+        // Error, should never happend...
+    }
   }
 }
 
