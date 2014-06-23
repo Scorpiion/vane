@@ -27,6 +27,7 @@ part 'src/serve.dart';
 part 'src/annotations.dart';
 part 'src/get_controller_mirrors.dart';
 part 'src/generate_routes.dart';
+part 'src/parse_route.dart';
 
 part 'middleware/log.dart';
 part 'middleware/cors.dart';
