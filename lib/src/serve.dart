@@ -1,3 +1,5 @@
+// Copyright (c) 2014, Robert Åkerblom-Andersson <Robert@dartvoid.com>
+
 part of vane;
 
 void serve() {

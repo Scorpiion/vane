@@ -1,3 +1,5 @@
+// Copyright (c) 2014, Robert Åkerblom-Andersson <Robert@dartvoid.com>
+
 part of vane;
 
 class RouteMatch {
@@ -8,8 +10,8 @@ class RouteMatch {
 }
 
 class Router {
-  List<_VaneRoute> routes;
   List<ClassMirror> controllerMirrors;
+  List<_VaneRoute> routes;
 
   Router() {
     controllerMirrors = getControllerMirrors();
