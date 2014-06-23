@@ -50,16 +50,17 @@ void serve() {
           // Serve server request
           router.serve(request, match);
         } else {
-          stderr.writeln("Error 404: Could not find any handler matching path: ${request.uri.path}");
+          Logger.root.warning("Could not find any handler matching path: ${request.uri.path}");
+          request.response.statusCode = HttpStatus.NOT_FOUND;
           request.response.close();
         }
       });
     });
   },
   onError: (e, stackTrace) {
-    stderr.writeln(e);
-    stderr.writeln("\n");
-    stderr.writeln(stackTrace);
+    Logger.root.warning(e);
+    Logger.root.warning("\n");
+    Logger.root.warning(stackTrace);
   });
 }
 
