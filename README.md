@@ -104,7 +104,7 @@ import 'package:vane/vane.dart';
 class HelloWorld extends Vane {
   @Route("/")
   Future Hello() {
-    close("Hello world");
+    return close("Hello world");
   }
 }
 
@@ -121,13 +121,13 @@ class HelloVane extends Vane {
   @Route("/")
   @Route("/vane")
   Future World() {
-    close("Hello world! (from vane handler)");
+    return close("Hello world! (from vane handler)");
   }
 
   @Route("/{user}")
   @Route("/vane/{user}")
   Future User(String user) {
-    close("Hello ${user}! (from vane handler)");
+    return close("Hello ${user}! (from vane handler)");
   }
 }
 
