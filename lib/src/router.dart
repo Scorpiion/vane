@@ -30,11 +30,16 @@ class Router {
 //        print("Checking func controller: ${route.method} with path ${route.parser.template}");
 //      }
 
-      // See if uri match uri template for route
-      match.match = route.parser.match(request.uri);
-      if(match.match != null) {
-        match.route = route;
-        break;
+      // Only try to match the route if the http method match
+      if(route.metaRoute.method == "" ||
+         route.metaRoute.method == request.method ||
+         route.metaRoute.methods.contains(request.method)) {
+        // See if uri match uri template for route
+        match.match = route.parser.match(request.uri);
+        if(match.match != null) {
+          match.route = route;
+          break;
+        }
       }
     }
 
