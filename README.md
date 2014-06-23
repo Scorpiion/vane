@@ -92,9 +92,9 @@ class MyMiddleware extends Vane {
 ```
 
 ### Vane's server.dart file
-With Vane you don't have to worry about writing a dart/web server, you focus on writing your controllers/handlers
-and Vane serves your handlers. All you need to do is to make sure they are in the same library 
-and that you start the serve function. 
+With Vane you don't have to worry about writing a dart/web server, you focus on writing your 
+controllers/handlers and Vane serves them for you automatically based on your @Route annotations.  
+All you need to do is to make sure they are in the same library and that you start the serve function. 
 
 ### Hello World with a Vane handler  
 ```dart
@@ -161,11 +161,12 @@ void main() => serve();
 ```
 
 ### Summary
-* Class based, easy to make your own standard class that you extend for your handlers
+* Support three handler types; Func, Podo and Vane
+* Class based, easy to make your own standard classes by extending any Podo or Vane class and addingyour handlers
 * Simple top level access to commonly used data such as paramters, json body or uploaded files
 * Out of the box websocket support
-* Any handler class can be registed either as the main class or as middleware
-* Middleware classes can be defined to run synchronously or asynchronously, before or after the main handler
+* Any Vane  class can either run as the main controller or as a middleware
+* Middleware classes can be defined to run synchronously or asynchronously, before or after the main controller
 * Built in "plug and play" support for Mongodb 
 
 ### Documentation, examples and roadmap
