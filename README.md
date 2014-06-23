@@ -17,11 +17,11 @@ import 'dart:async';
 import 'package:vane/vane.dart';
 
 class HelloWorld extends Vane {
-  @Route("/{user}")
-  Future User(String user) => close("Hello ${user}");
-
   @Route("/")
   Future World() => close("Hello world");
+  
+  @Route("/{user}")
+  Future User(String user) => close("Hello ${user}");
 }
 
 void main() => serve();
