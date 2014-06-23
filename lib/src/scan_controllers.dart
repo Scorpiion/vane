@@ -14,7 +14,6 @@ Controllers scanControllers() {
       mirrorSystem.isolate.rootLibrary.declarations;
   Controllers controllers = new Controllers();
   ClassMirror VaneMirror = reflectClass(Vane);
-  InstanceMirror RouteMirror = reflect(Route);
 
   for(var mirror in declarations.values) {
     if(mirror is ClassMirror) {
