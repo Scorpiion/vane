@@ -1,13 +1,31 @@
+// Copyright (c) 2014, Robert Åkerblom-Andersson <Robert@dartvoid.com>
+
 part of vane;
+
+class _VaneRoute {
+  String name;
+  Route baseRoute;
+  List<_Handler> handlers = [];
+  List<ClassMirror> pre;
+  List<ClassMirror> post;
+  ClassMirror mirror;
+}
+
+class _Handler {
+  String name;
+  Route route;
+  UriParser parser;
+  List<String> parameters = [];
+}
 
 List<_VaneRoute> generateRoutes(List<ClassMirror> controllerMirrors) {
   List<_VaneRoute> routes = new List<_VaneRoute>();
 
   for(var controllerMirror in controllerMirrors) {
     _VaneRoute route = new _VaneRoute();
-
 //    print("Adding routes for controller: ${realname(controllerMirror)}");
 
+    // Add name and mirror to route
     route.name = realname(controllerMirror);
     route.mirror = controllerMirror;
 
@@ -58,5 +76,9 @@ List<_VaneRoute> generateRoutes(List<ClassMirror> controllerMirrors) {
   }
 
   return routes;
+}
+
+String realname(DeclarationMirror mirror) {
+  return mirror.simpleName.toString().split('"')[1];
 }
 
