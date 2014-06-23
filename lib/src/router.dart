@@ -23,11 +23,11 @@ class Router {
     // Check request uri against routes
     for(var route in routes) {
 //      if(route.type == _vane) {
-//        print("Checking vane controller: ${route.controller}.${route.method} with path ${route.parser.template}");
+//        Logger.root.info("Checking vane controller: ${route.controller}.${route.method} with path ${route.parser.template}");
 //      } else if(route.type == _podo) {
-//        print("Checking podo controller: ${route.controller}.${route.method} with path ${route.parser.template}");
+//        Logger.root.info("Checking podo controller: ${route.controller}.${route.method} with path ${route.parser.template}");
 //      } else {
-//        print("Checking func controller: ${route.method} with path ${route.parser.template}");
+//        Logger.root.info("Checking func controller: ${route.method} with path ${route.parser.template}");
 //      }
 
       // Only try to match the route if the http method match
@@ -64,7 +64,7 @@ class Router {
     // Setup controller specific settings and invoke controller
     switch(match.route.type) {
       case _vane:
-        print("Serving request ${match.match.input} with vane handler ${match.route.controller}.${match.route.method}");
+        Logger.root.info("Serving request ${match.match.input} with vane handler ${match.route.controller}.${match.route.method}");
 
         // Create new instance of vane controller
         vaneController = match.route.classMirror.newInstance(const Symbol(""), []);
@@ -115,7 +115,7 @@ class Router {
         break;
 
       case _podo:
-        print("Serving request ${match.match.input} with podo handler ${match.route.controller}.${match.route.method}");
+        Logger.root.info("Serving request ${match.match.input} with podo handler ${match.route.controller}.${match.route.method}");
 
         // Create new instance of podo controller
         podoController = match.route.classMirror.newInstance(const Symbol(""), []);
@@ -148,13 +148,13 @@ class Router {
           case 23: podoController.invoke(new Symbol(match.route.method), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23]]); break;
           case 24: podoController.invoke(new Symbol(match.route.method), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24]]); break;
           case 25: podoController.invoke(new Symbol(match.route.method), [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24], handlerParams[25]]); break;
-          default: print("Error, too many paramters for handler");
+          default: Logger.root.info("Error, too many paramters for handler");
         }
 
         break;
 
       case _func:
-        print("Serving request ${match.match.input} with func handler ${match.route.method}");
+        Logger.root.info("Serving request ${match.match.input} with func handler ${match.route.method}");
 
         // Create library mirror for func controller
         funcController = match.route.funcMirror.owner;
@@ -187,7 +187,7 @@ class Router {
           case 23: funcController.invoke(match.route.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23]]); break;
           case 24: funcController.invoke(match.route.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24]]); break;
           case 25: funcController.invoke(match.route.funcMirror.simpleName, [request, handlerParams[1], handlerParams[2], handlerParams[3], handlerParams[4], handlerParams[5], handlerParams[6], handlerParams[7], handlerParams[8], handlerParams[9], handlerParams[10], handlerParams[11], handlerParams[12], handlerParams[13], handlerParams[14], handlerParams[15], handlerParams[16], handlerParams[17], handlerParams[18], handlerParams[19], handlerParams[20], handlerParams[21], handlerParams[22], handlerParams[23], handlerParams[24], handlerParams[25]]); break;
-          default: print("Error, too many paramters for handler");
+          default: Logger.root.info("Error, too many paramters for handler");
         }
 
         break;

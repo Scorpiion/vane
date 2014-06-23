@@ -31,21 +31,21 @@ _Middlewares parsePipeline(ClassMirror controllerMirror) {
 
             if(middleware.isSubtypeOf(VaneMirror)) {
               if(foundThis == false) {
-//                print("Adding to pre list: ${pipelineEntry}");
+//                Logger.root.info("Adding to pre list: ${pipelineEntry}");
                 middlewares.pre.add(middleware);
               } else {
-//                print("Adding to post list: ${pipelineEntry}");
+//                Logger.root.info("Adding to post list: ${pipelineEntry}");
                 middlewares.post.add(middleware);
               }
             } else {
-              print("Error only classes that extend Vane can be added to the pipeline");
+              Logger.root.info("Error only classes that extend Vane can be added to the pipeline");
               return null;
             }
           } else {
             if(pipelineEntry == This) {
               foundThis = true;
             } else {
-              print("Error only classes that extend Vane can be added to the pipeline");
+              Logger.root.info("Error only classes that extend Vane can be added to the pipeline");
               return null;
             }
           }

@@ -8,6 +8,20 @@ void serve() {
   var appRoot = path.current;
   appRoot = "/home/robert/dv-workplace/Vane-Hello-World";
 
+  // Setup logger
+  Logger.root.level = Level.CONFIG;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    if(rec.level == Level.SEVERE ||
+       rec.level == Level.SHOUT ||
+       rec.level == Level.WARNING) {
+      var name = (rec.loggerName.length == 0) ? "" : " ${rec.loggerName}";
+      stderr.write('${rec.time} ${rec.level.name}${name}: ${rec.message}\n');
+    } else {
+      var name = (rec.loggerName.length == 0) ? "" : " ${rec.loggerName}";
+      stdout.write('${rec.time} ${rec.level.name}${name}: ${rec.message}\n');
+    }
+  });
+
   runZoned(() {
     // Server port assignment
     var portEnv = Platform.environment['PORT'];
@@ -20,7 +34,7 @@ void serve() {
       ..allowDirectoryListing = false;
     }
 
-    print("Starting vane server: 127.0.0.1:${port}");
+    Logger.root.info("Starting vane server: 127.0.0.1:${port}");
 
     HttpServer.bind("127.0.0.1", port).then((server) {
       RouteMatch match;

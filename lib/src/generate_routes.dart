@@ -45,7 +45,7 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
     Route baseMetaRoute;
     _Middlewares middlewares;
 
-//    print("Adding routes for controller: ${realname(mirror)}");
+//    Logger.root.info("Adding routes for controller: ${realname(mirror)}");
 
     // Add name and mirror to route
     controller = realname(mirror);
@@ -80,12 +80,12 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
         // Save handler route
         for(var meta in method.metadata) {
           if(meta.reflectee is Route) {
-//            print(" Adding vane handler: ${realname(method)}");
+//            Logger.root.info(" Adding vane handler: ${realname(method)}");
             route.method = realname(method);
             route.metaRoute = parseRoute(meta, baseMetaRoute);
             route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
             for(VariableMirror parameter in method.parameters) {
-//              print("  Parameter = ${realname(parameter)}");
+//              Logger.root.info("  Parameter = ${realname(parameter)}");
               route.parameters.add(realname(parameter));
             }
           }
@@ -106,7 +106,7 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
     String controller;
     Route baseMetaRoute;
 
-//    print("Adding routes for podo controller: ${realname(mirror)}");
+//    Logger.root.info("Adding routes for podo controller: ${realname(mirror)}");
 
     // Add name and mirror to route
     controller = realname(mirror);
@@ -133,12 +133,12 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
         // Save handler route
         for(var meta in method.metadata) {
           if(meta.reflectee is Route) {
-//            print(" Adding vane handler: ${realname(method)}");
+//            Logger.root.info(" Adding vane handler: ${realname(method)}");
             route.method = realname(method);
             route.metaRoute = parseRoute(meta, baseMetaRoute);
             route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
             for(VariableMirror parameter in method.parameters) {
-//              print("  Parameter = ${realname(parameter)}");
+//              Logger.root.info("  Parameter = ${realname(parameter)}");
               route.parameters.add(realname(parameter));
             }
           }
@@ -153,7 +153,7 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
   // Setup func controllers
   for(var mirror in controllers.funcControllers) {
     _VaneRoute route = new _VaneRoute();
-//    print("Adding routes for func controller: ${realname(mirror)}");
+//    Logger.root.info("Adding routes for func controller: ${realname(mirror)}");
 
     // Add name and mirror to route
     route.method = realname(mirror);
@@ -167,7 +167,7 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
         route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
 
         for(VariableMirror parameter in mirror.parameters) {
-//          print("  Parameter = ${realname(parameter)}");
+//          Logger.root.info("  Parameter = ${realname(parameter)}");
           route.parameters.add(realname(parameter));
         }
       }

@@ -42,7 +42,7 @@ Route parseRoute(InstanceMirror routeMirror, [Route baseRoute]) {
                         methods: methods);
     }
   } else {
-    print("${routeMirror.reflectee} is not Route");
+    Logger.root.info("${routeMirror.reflectee} is not Route");
   }
 
   return route;
