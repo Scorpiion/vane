@@ -72,15 +72,15 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
         => method is MethodMirror && method.isRegularMethod)) {
       // Check if the method have a @Route annotation
       if(method.metadata.any((meta) => meta.reflectee is Route) == true) {
-        _VaneRoute route = new _VaneRoute();
-        route.controller = controller;
-        route.type = _vane;
-        route.classMirror = mirror;
-
-        // Save handler route
         for(var meta in method.metadata) {
           if(meta.reflectee is Route) {
+            _VaneRoute route = new _VaneRoute();
+            route.controller = controller;
+            route.type = _vane;
+            route.classMirror = mirror;
+
 //            Logger.root.info(" Adding vane handler: ${realname(method)}");
+
             route.method = realname(method);
             route.metaRoute = parseRoute(meta, baseMetaRoute);
             route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
@@ -88,15 +88,15 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
 //              Logger.root.info("  Parameter = ${realname(parameter)}");
               route.parameters.add(realname(parameter));
             }
+
+            // Save middleware
+            route.pre = middlewares.pre;
+            route.post = middlewares.post;
+
+            // Save route to controller
+            routes.add(route);
           }
         }
-
-        // Save middleware
-        route.pre = middlewares.pre;
-        route.post = middlewares.post;
-
-        // Save route to controller
-        routes.add(route);
       }
     }
   }
@@ -125,15 +125,15 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
         => method is MethodMirror && method.isRegularMethod)) {
       // Check if the method have a @Route annotation
       if(method.metadata.any((meta) => meta.reflectee is Route) == true) {
-        _VaneRoute route = new _VaneRoute();
-        route.controller = controller;
-        route.type = _podo;
-        route.classMirror = mirror;
-
-        // Save handler route
         for(var meta in method.metadata) {
           if(meta.reflectee is Route) {
+            _VaneRoute route = new _VaneRoute();
+            route.controller = controller;
+            route.type = _podo;
+            route.classMirror = mirror;
+
 //            Logger.root.info(" Adding vane handler: ${realname(method)}");
+
             route.method = realname(method);
             route.metaRoute = parseRoute(meta, baseMetaRoute);
             route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
@@ -141,28 +141,27 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
 //              Logger.root.info("  Parameter = ${realname(parameter)}");
               route.parameters.add(realname(parameter));
             }
+
+            // Save route to controller
+            routes.add(route);
           }
         }
-
-        // Save route to controller
-        routes.add(route);
       }
     }
   }
 
   // Setup func controllers
   for(var mirror in controllers.funcControllers) {
-    _VaneRoute route = new _VaneRoute();
-//    Logger.root.info("Adding routes for func controller: ${realname(mirror)}");
-
-    // Add name and mirror to route
-    route.method = realname(mirror);
-    route.type = _func;
-    route.funcMirror = mirror;
-
-    // Save handler route
     for(var meta in mirror.metadata) {
       if(meta.reflectee is Route) {
+        _VaneRoute route = new _VaneRoute();
+//    Logger.root.info("Adding routes for func controller: ${realname(mirror)}");
+
+        // Add name and mirror to route
+        route.method = realname(mirror);
+        route.type = _func;
+        route.funcMirror = mirror;
+
         route.metaRoute = parseRoute(meta);
         route.parser = new UriParser(new UriTemplate(route.metaRoute.path));
 
@@ -170,11 +169,11 @@ List<_VaneRoute> generateRoutes(Controllers controllers) {
 //          Logger.root.info("  Parameter = ${realname(parameter)}");
           route.parameters.add(realname(parameter));
         }
+
+        // Save route
+        routes.add(route);
       }
     }
-
-    // Save route
-    routes.add(route);
   }
 
   // Sort routes
