@@ -1,5 +1,5 @@
-Vane is a framework to make it easy and fun to write Dart serverside 
-applications. With Vane you can write both simple and advanced applications, 
+Vane is a framework to make it easy and fun to write Dart applications. 
+With Vane you can write both simple and advanced applications, 
 with the powerful middleware system you can write reusable classes that you can 
 build a chain out of that processes your requests. 
 
@@ -11,17 +11,65 @@ you are guaranteed that they execute in the order you define. From any Vane
 class you can choose to execute the next class by running `next()` or to 
 return to the client by running `close()`.
 
-### Hello World
+Vane supports three different types of handlers:
+1. Vane handlers - Classes that extend the Vane class, lightweight and easier to use) 
+2. Podo handlers - "Plain Old Dart Objects", normal classes that have one or more 
+functions with the @Route annotation
+3. Func handlers - Function handlers, normal dart function with the @Route annotation 
+
+### Simple Hello World with a Vane handler  
 ```dart
 import 'dart:async';
 import 'package:vane/vane.dart';
 
 class HelloWorld extends Vane {
   @Route("/")
-  Future World() => close("Hello world");
-  
+  Future Hello() => close("Hello world");
+}
+
+void main() => serve();
+```
+
+### Hello World with both two Vane handlers, two Podo handlers and two func handlers  
+```dart
+import 'dart:io';
+import 'dart:async';
+import 'package:vane/vane.dart';
+
+class HelloVane extends Vane {
+  @Route("/")
+  @Route("/vane")
+  Future World() => close("Hello world! (from vane handler)");
+
   @Route("/{user}")
-  Future User(String user) => close("Hello ${user}");
+  @Route("/vane/{user}")
+  Future User(String user) => close("Hello ${user}! (from vane handler)");
+}
+
+class HelloPodo {
+  @Route("/podo")
+  void World(HttpRequest request) {
+    request.response.write("Hello World! (from podo handler)");
+    request.response.close();
+  }
+
+  @Route("/podo/{user}")
+  void User(HttpRequest request, String user) {
+    request.response.write("Hello World $user! (from podo handler)");
+    request.response.close();
+  }
+}
+
+@Route("/func")
+void helloFuncWorld(HttpRequest request) {
+  request.response.write("Hello World! (from func handler)");
+  request.response.close();
+}
+
+@Route("/func/{user}")
+void helloFuncUser(HttpRequest request, String user) {
+  request.response.write("Hello World $user! (from func handler)");
+  request.response.close();
 }
 
 void main() => serve();
