@@ -55,7 +55,7 @@ class Vane {
 
   /// Tube
   ///
-  /// A tube is a combination the a sink and a stream combined with a syncronous
+  /// A tube is a combination the a sink and a stream combined with a synchronous
   /// way to pass a value between a sender and a receiver. A tube is used to pass
   /// values between different vane handler.
   ///
@@ -63,18 +63,44 @@ class Vane {
   /// sending single values with [send] and [receive].
   ///
   /// Example of how to use [send] and [receive] :
+  ///     class HelloWorld extends Vane {
+  ///       var pipeline = [HelloMiddleware, This];
   ///
-  ///     class .....
+  ///       @Route("/")
+  ///       Future main() {
+  ///         var data = tube.receive();
+  ///         print(data);
+  ///         return close("Hello ${data["name"]}!");
+  ///       }
+  ///     }
+  ///
+  ///     class HelloMiddleware extends Vane {
+  ///       Future main() {
+  ///         tube.send({"first": "testuser"});
+  ///         return next();
+  ///       }
+  ///     }
   ///
   /// Example of how to use [add] and [listen] :
+  ///     class HelloWorld extends Vane {
+  ///       var pipeline = [HelloMiddleware, This];
   ///
-  ///     class .....
+  ///       @Route("/")
+  ///       Future main() {
+  ///         tube.listen((data) => close("Hello ${data["name"]}!"));
+  ///         return end;
+  ///       }
+  ///     }
   ///
-  /// TODO Add examples
-  ///
+  ///     class HelloMiddleware extends Vane {
+  ///       Future main() {
+  ///         tube.add({"name": "testuser"});
+  ///         return next();
+  ///       }
+  ///     }
   Tube get tube => _core.tube;
 
-  /// Middleware setting, middleware runs syncronously per default but that
+  /// Middleware setting, middleware runs synchronously per default but that
   /// behaviour can be changed so that some middleware classes are allowed
   /// to run asynchronously. Set [async] to true in your middleware if you
   /// want it to run asynchronously.
@@ -83,6 +109,8 @@ class Vane {
   /// start until all middleware classes has started or a synchronous middleware
   /// comes in the list, if it does, then all async middleware will be waited
   /// on before the next sync or async middleware is started.
+  ///
+  /// For demonstrative purposes [Timer] simulates a big workload for the example middlewares.
   ///
   /// Example of middleware that runs synchronously (default behaviour):
   ///     class TestClass extends Vane {
