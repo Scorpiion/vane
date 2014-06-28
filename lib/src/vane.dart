@@ -273,19 +273,23 @@ class Vane {
   ///
   /// Example class:
   ///     class SessionTestClass extends Vane {
-  ///       Future main() {
-  ///         session["name"] = query["name"];
-  ///         print('Hello ${session["name"]}');
-  ///         write('Hello ${session["name"]}');
-  ///         return close();
+  ///       @Route("/")
+  ///       Future get(String name) {
+  ///         return close("Hello ${session["name"]}");
+  ///       }
+  ///
+  ///       @Route("/{?name}")
+  ///       Future set(String name) {
+  ///         session["name"] = name;
+  ///         return close("Hello ${session["name"]}");
   ///       }
   ///     }
   ///
   /// Set name with:
-  ///     curl http://[appname].[user].dartblob.com/[handler]?name=World
+  ///     curl http://[appname].[user].dartblob.com/?name=World
   ///
   /// See value getting fetched from session:
-  ///     curl http://[appname].[user].dartblob.com/[handler]
+  ///     curl http://[appname].[user].dartblob.com/
   ///
   Map<String, Object> get session => _VaneCore.session;
 
