@@ -69,7 +69,6 @@ class Vane {
   ///       @Route("/")
   ///       Future main() {
   ///         var data = tube.receive();
-  ///         print(data);
   ///         return close("Hello ${data["name"]}!");
   ///       }
   ///     }
