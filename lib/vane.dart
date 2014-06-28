@@ -8,7 +8,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:mirrors';
 import 'package:uri/uri.dart';
-import 'package:path/path.dart' as path;
 import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler, VirtualDirectory;
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db;
