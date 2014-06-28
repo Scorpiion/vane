@@ -299,15 +299,16 @@ class Vane {
   ///
   /// Example:
   ///     class PathTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${path[0]}');
-  ///         write('Hello ${path[0]}');
-  ///         return close();
+  ///         var msg = path.length > 0 ? path[0] : "";
+  ///         log.info("Hello $msg");
+  ///         return close("Hello $msg");
   ///       }
   ///     }
   ///
   /// Test url:
-  ///     curl http://[appname].[user].dartblob.com/[handler]/[yourName]
+  ///     curl http://[appname].[user].dartblob.com/[message]
   ///
   /// Note: This is a shorthand for req.uri.pathSegments
   ///
