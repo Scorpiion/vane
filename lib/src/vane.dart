@@ -448,10 +448,8 @@ class Vane {
   ///       }
   ///     }
   ///
-  /// Test url:
-  ///      http://www.websocket.org/echo.html
-  ///
-  /// Connect to websocket server:
+  /// Connect to the websocket server through a test client:
+  ///     http://www.websocket.org/echo.html
   ///     ws://localhost:9090/ws
   ///
   WebSocket get ws {
