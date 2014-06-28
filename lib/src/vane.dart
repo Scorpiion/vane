@@ -476,6 +476,7 @@ class Vane {
   ///
   /// Connect to mongodb and add an entry:
   ///     class MongodbInsertExample extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         var name = "world";
   ///
@@ -490,6 +491,7 @@ class Vane {
   ///
   /// Connect to mongodb and get all entries:
   ///     class MongodbFetchExample extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         mongodb.then((mongodb) {
   ///           DbCollection coll = mongodb.collection("testCollection");
