@@ -4,42 +4,24 @@ Vane
 Vane is server side framework written and optimized for the Dart programming 
 langauge. Vane comes bundled with a lightweight and performant middleware 
 system and strives to provide commonly used parameters and objects in an easy
-to use manner such as query paramters or json body data. 
+to use manner such as query parameters or json body data. 
 
+## Summary
+* Supports three handler types; Func, Podo and Vane
+* Class based, easy to make your own standard classes by extending any Podo or Vane class and adding your own behavior
+* Simple top level access to commonly used data such as query parameters, json body or file uploads
+* Out of the box websocket support
+* Any Vane class can run as the main controller or as a middleware
+* Middlewares can be defined to run synchronously or asynchronously, before or after the main controller
+* Built in "plug and play" support for Mongodb
+
+## Handlers
 Vane supports three different types of handlers:
 
-1. Func handlers - Function handlers, normal dart function with the @Route annotation 
-2. Podo handlers - "Plain Old Dart Objects", normal classes that have one or more 
+1. Vane handlers - Classes that extend the Vane class
+2. Podo handlers - "Plain Old Dart Objects", normal classes that have one or more
 functions with the @Route annotation
-3. Vane handlers - Classes that extend the Vane class
-
-### Func handler 
-A function handler is simple a function that takes at least 1 HttpRequest paramter and 
-optionally 1 or more paramters that can be mapped from the url.
-
-Hello World Example:
-```dart
-@Route("/")
-void helloFuncWorld(HttpRequest request) {
-  request.response.write("Hello World! (from func handler)");
-  request.response.close();
-}
-```
-
-### Podo handler 
-A podo handler is a "Plain Old Dart Object", basically any Dart class that have 1 or more
-function handlers with declared with the @Route annotation.
-
-Hello World Example:
-```dart
-class HelloPodo {
-  @Route("/")
-  void World(HttpRequest request) {
-    request.response.write("Hello World! (from podo handler)");
-    request.response.close();
-  }
-}
-```
+3. Func handlers - Function handlers, normal dart function with the @Route annotation 
 
 ### Vane handler 
 A vane handler is any class that extends the Vane class. When you extend the Vane class your 
@@ -91,7 +73,35 @@ class MyMiddleware extends Vane {
 }
 ```
 
-### Vane's server.dart file
+### Podo handler 
+A podo handler is a "Plain Old Dart Object", basically any Dart class that have 1 or more
+function handlers with declared with the @Route annotation.
+
+Hello World Example:
+```dart
+class HelloPodo {
+  @Route("/")
+  void World(HttpRequest request) {
+    request.response.write("Hello World! (from podo handler)");
+    request.response.close();
+  }
+}
+```
+
+### Func handler 
+A function handler is simple a function that takes at least 1 HttpRequest parameter and 
+optionally 1 or more parameters that can be mapped from the url.
+
+Hello World Example:
+```dart
+@Route("/")
+void helloFuncWorld(HttpRequest request) {
+  request.response.write("Hello World! (from func handler)");
+  request.response.close();
+}
+```
+
+## Vane server (server.dart)
 With Vane you don't have to worry about writing a dart/web server, you focus on writing your 
 controllers/handlers and Vane serves them for you automatically based on your @Route annotations.  
 All you need to do is to make sure they are in the same library and that you start the serve function. 
@@ -160,17 +170,8 @@ void helloFuncUser(HttpRequest request, String user) {
 void main() => serve();
 ```
 
-### Summary
-* Support three handler types; Func, Podo and Vane
-* Class based, easy to make your own standard classes by extending any Podo or Vane class and addingyour handlers
-* Simple top level access to commonly used data such as paramters, json body or uploaded files
-* Out of the box websocket support
-* Any Vane  class can either run as the main controller or as a middleware
-* Middleware classes can be defined to run synchronously or asynchronously, before or after the main controller
-* Built in "plug and play" support for Mongodb 
-
-### Documentation, examples and roadmap
-* [Vane project homepage and documentation](http://www.dartvoid.com/vane/)
-* [Vane API documentation](http://www.dartvoid.com/docs/vaneapi/)
-* [Vane@Github](https://github.com/DartVoid/Vane)
+## Documentation, examples and roadmap
+* [Official project page and documentation](http://www.dartvoid.com/vane/)
+* [API documentation](http://www.dartvoid.com/docs/vaneapi/)
+* [Github project](https://github.com/DartVoid/Vane)
 
