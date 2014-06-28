@@ -372,10 +372,10 @@ class Vane {
   ///
   /// Example:
   ///     class JsonTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${json["name"]}');
-  ///         write('Hello ${json["name"]}');
-  ///         return close();
+  ///         log.info('Hello ${json["name"]}');
+  ///         return close("Hello ${json["name"]}");
   ///       }
   ///     }
   ///
@@ -396,6 +396,7 @@ class Vane {
   ///
   /// Example:
   ///     class FilesTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         print(files["fileupload"].filename);
   ///         print('Content type = ${files["fileupload"].contentType}');
