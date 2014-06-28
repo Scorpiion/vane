@@ -320,10 +320,10 @@ class Vane {
   ///
   /// Example:
   ///     class QueryTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${query["name"]}');
-  ///         write('Hello ${query["name"]}');
-  ///         return close();
+  ///         log.info("Hello ${query["name"]}");
+  ///         return close("Hello ${query["name"]}");
   ///       }
   ///     }
   ///
@@ -348,10 +348,10 @@ class Vane {
   ///
   /// Example:
   ///     class ParamsTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${params["name"]}');
-  ///         write('Hello ${params["name"]}');
-  ///         return close();
+  ///         log.info("Hello ${params["name"]}");
+  ///         return close("Hello ${params["name"]}");
   ///       }
   ///     }
   ///
