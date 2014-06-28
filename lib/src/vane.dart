@@ -769,11 +769,9 @@ class Vane {
   ///
   /// Example with pre middleware that uses [next]:
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new TestMiddlewareDoesNotClose());
-  ///         pre.add(new TestMiddlewareDoesNotClose());
-  ///       }
+  ///       var pipeline = [TestMiddlewareDoesNotClose, TestMiddlewareDoesNotClose, This];
   ///
+  ///       Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
@@ -783,11 +781,9 @@ class Vane {
   /// Example with pre middleware that uses [close] (the request will only
   /// reach the first middleware class since it uses [close]):
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre(new TestMiddlewareThatDoClose());
-  ///         pre(new TestMiddlewareDoesNotClose());
-  ///       }
+  ///       var pipeline = [TestMiddlewareThatDoClose, TestMiddlewareDoesNotClose, This];
   ///
+  ///       Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
