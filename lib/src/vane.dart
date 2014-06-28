@@ -286,10 +286,10 @@ class Vane {
   ///     }
   ///
   /// Set name with:
-  ///     curl http://[appname].[user].dartblob.com/?name=World
+  ///     curl "http://localhost:9090/?name=World"
   ///
   /// See value getting fetched from session:
-  ///     curl http://[appname].[user].dartblob.com/
+  ///     curl "http://localhost:9090/"
   ///
   Map<String, Object> get session => _VaneCore.session;
 
@@ -308,7 +308,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl http://[appname].[user].dartblob.com/[message]
+  ///     curl "http://localhost:9090/World"
   ///
   /// Note: This is a shorthand for req.uri.pathSegments
   ///
@@ -328,7 +328,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl http://[appname].[user].dartblob.com/[handler]?name=World
+  ///     curl "http://localhost:9090/?name=World"
   ///
   /// Note: This is a shorthand for req.uri.queryParameters
   ///
@@ -356,7 +356,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl -XPOST --data 'name=world' 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl -X POST --data "name=world" "http://localhost:9090/"
   ///
   Map<String, String> get params {
     if(_core.params == null) {
@@ -380,7 +380,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' "http://localhost:9090/"
   ///
   Map get json {
     if(_core.json == null) {
@@ -413,7 +413,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl --form "fileupload=@[path_to_file]" 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl --form "fileupload=@README.md" "http://localhost:9090/"
   ///
   Map<String, dynamic> get files {
     if(_core.files == null) {
