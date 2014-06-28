@@ -432,15 +432,27 @@ class Vane {
   ///
   /// Example of a websocket echo service:
   ///     class WebsocketEchoClass extends Vane {
+  ///       @Route("/ws")
   ///       Future main() {
   ///         var conn = ws.listen(null);
-  ///         conn.onData((data) => ws.add("Echo: $data"));
+  ///
+  ///         conn.onData((data) {
+  ///           log.info(data);
+  ///           ws.add("Echo: $data");
+  ///         });
+  ///
   ///         conn.onError((e) => log.warning(e));
-  ///         conn.onDone((_) => close());
+  ///         conn.onDone(() => close());
   ///
   ///         return end;
   ///       }
   ///     }
+  ///
+  /// Test url:
+  ///      http://www.websocket.org/echo.html
+  ///
+  /// Connect to websocket server:
+  ///     ws://localhost:9090/ws
   ///
   WebSocket get ws {
     if(_core.ws == null) {
