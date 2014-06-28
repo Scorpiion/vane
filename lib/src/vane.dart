@@ -32,8 +32,8 @@ class Vane {
 
   /// VaneRequest
   ///
-  /// Request object that contains paramters from the incomming request.
-  /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects paramters
+  /// Request object that contains parameters from the incomming request.
+  /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects parameters
   /// were some parts has been moved to top level in Vane such as parts
   /// regarding the body of the request that is availble as easy to use objects
   /// such as [session], [body], [json] and [params].
@@ -44,8 +44,8 @@ class Vane {
 
   /// VaneResponse
   ///
-  /// Response object that contains paramters used in the response.
-  /// [:VaneResponse:] contains a subset of the [:HttpResponse:] object paramters
+  /// Response object that contains parameters used in the response.
+  /// [:VaneResponse:] contains a subset of the [:HttpResponse:] object parameters
   /// were some parts has been moved to top level in Vane such as the write
   /// functions.
   ///
@@ -97,6 +97,7 @@ class Vane {
   ///         return next();
   ///       }
   ///     }
+  ///
   Tube get tube => _core.tube;
 
   /// Middleware setting, middleware runs synchronously per default but that
@@ -179,7 +180,7 @@ class Vane {
   ///     class EndExample1 extends Vane {
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in sync!');
+  ///           log.info('Running synchronously!');
   ///           close();
   ///         });
   ///
@@ -190,7 +191,7 @@ class Vane {
   /// Example 2:
   ///     class EndExample2 extends Vane {
   ///       Future main() {
-  ///         log.info('Running in sync!');
+  ///         log.info('Running synchronously!');
   ///         return close();
   ///       }
   ///     }
@@ -288,9 +289,9 @@ class Vane {
   ///
   Map<String, Object> get session => _VaneCore.session;
 
-  /// Path paramters
+  /// Path parameters
   ///
-  /// Parsed decoded path paramters from the request.
+  /// Parsed decoded path parameters from the request.
   ///
   /// Example:
   ///     class PathTestClass extends Vane {
@@ -308,9 +309,9 @@ class Vane {
   ///
   List<String> get path => _core.req.uri.pathSegments;
 
-  /// Query paramters
+  /// Query parameters
   ///
-  /// Parsed decoded query paramters from the request.
+  /// Parsed decoded query parameters from the request.
   ///
   /// Example:
   ///     class QueryTestClass extends Vane {
@@ -336,9 +337,9 @@ class Vane {
   ///
   HttpRequestBody get body => _core.body;
 
-  /// POST paramters
+  /// POST parameters
   ///
-  /// Parsed query paramters from the request.
+  /// Parsed query parameters from the request.
   ///
   /// Example:
   ///     class ParamsTestClass extends Vane {
@@ -362,7 +363,7 @@ class Vane {
 
   /// Parsed JSON body
   ///
-  /// A map of json paramters sent in the body of a request.
+  /// A map of json parameters sent in the body of a request.
   ///
   /// Example:
   ///     class JsonTestClass extends Vane {
@@ -513,7 +514,7 @@ class Vane {
     return c.future;
   }
 
-  /// Process request and setup vane core paramters.
+  /// Process request and setup vane core parameters.
   Future _processRequest() {
     var c = new Completer();
 
@@ -888,7 +889,7 @@ class Vane {
                 case 24: return handler(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16], params[17], params[18], params[19], params[20], params[21], params[22], params[23], params[24]);
                 case 25: return handler(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16], params[17], params[18], params[19], params[20], params[21], params[22], params[23], params[24], params[25]);
                 default:
-                  log.info("Error, too many paramters for handler");
+                  log.info("Error, too many parameters for handler");
                   return main();
               }
             }
