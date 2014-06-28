@@ -113,11 +113,9 @@ class Vane {
   ///
   /// Example of middleware that runs synchronously (default behaviour):
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new SyncExample());
-  ///         pre.add(new SyncExample());
-  ///       }
+  ///       var pipeline = [SyncExample, SyncExample, This];
   ///
+  ///       @Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
@@ -127,7 +125,7 @@ class Vane {
   ///     class SyncExample extends Vane {
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in sync!');
+  ///           log.info('Running synchronously!');
   ///           next();
   ///         });
   ///
@@ -138,11 +136,9 @@ class Vane {
   ///
   /// Example of middleware that runs asynchronously:
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new AsyncExample());
-  ///         pre.add(new AsyncExample());
-  ///       }
+  ///       var pipeline = [AsyncExample, AsyncExample, This];
   ///
+  ///       @Route("/")
   ///       Future main() {
   ///         log.info("Inside TestClass");
   ///         return close();
@@ -150,11 +146,11 @@ class Vane {
   ///     }
   ///
   ///     class AsyncExample extends Vane {
-  ///       bool async = true;
+  ///       var async = true;
   ///
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in async!');
+  ///           log.info('Running asynchronously!');
   ///           next();
   ///         });
   ///
