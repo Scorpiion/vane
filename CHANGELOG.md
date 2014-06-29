@@ -1,3 +1,9 @@
+### 0.5.0+2
+
+* Updated text and fixed errors in README
+* Added usage examples for Tube
+* Updated examples
+
 ### 0.5.0
 
 * New Vane server implementation that can serve three types of handlers based on the @Route annotation.

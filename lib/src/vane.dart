@@ -32,8 +32,8 @@ class Vane {
 
   /// VaneRequest
   ///
-  /// Request object that contains paramters from the incomming request.
-  /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects paramters
+  /// Request object that contains parameters from the incomming request.
+  /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects parameters
   /// were some parts has been moved to top level in Vane such as parts
   /// regarding the body of the request that is availble as easy to use objects
   /// such as [session], [body], [json] and [params].
@@ -44,8 +44,8 @@ class Vane {
 
   /// VaneResponse
   ///
-  /// Response object that contains paramters used in the response.
-  /// [:VaneResponse:] contains a subset of the [:HttpResponse:] object paramters
+  /// Response object that contains parameters used in the response.
+  /// [:VaneResponse:] contains a subset of the [:HttpResponse:] object parameters
   /// were some parts has been moved to top level in Vane such as the write
   /// functions.
   ///
@@ -55,7 +55,7 @@ class Vane {
 
   /// Tube
   ///
-  /// A tube is a combination the a sink and a stream combined with a syncronous
+  /// A tube is a combination the a sink and a stream combined with a synchronous
   /// way to pass a value between a sender and a receiver. A tube is used to pass
   /// values between different vane handler.
   ///
@@ -63,18 +63,44 @@ class Vane {
   /// sending single values with [send] and [receive].
   ///
   /// Example of how to use [send] and [receive] :
+  ///     class HelloWorld extends Vane {
+  ///       var pipeline = [HelloMiddleware, This];
   ///
-  ///     class .....
+  ///       @Route("/")
+  ///       Future main() {
+  ///         var data = tube.receive();
+  ///         return close("Hello ${data["name"]}!");
+  ///       }
+  ///     }
+  ///
+  ///     class HelloMiddleware extends Vane {
+  ///       Future main() {
+  ///         tube.send({"first": "testuser"});
+  ///         return next();
+  ///       }
+  ///     }
   ///
   /// Example of how to use [add] and [listen] :
+  ///     class HelloWorld extends Vane {
+  ///       var pipeline = [HelloMiddleware, This];
   ///
-  ///     class .....
+  ///       @Route("/")
+  ///       Future main() {
+  ///         tube.listen((data) => close("Hello ${data["name"]}!"));
+  ///         return end;
+  ///       }
+  ///     }
   ///
-  /// TODO Add examples
+  ///     class HelloMiddleware extends Vane {
+  ///       Future main() {
+  ///         tube.add({"name": "testuser"});
+  ///         return next();
+  ///       }
+  ///     }
   ///
   Tube get tube => _core.tube;
 
-  /// Middleware setting, middleware runs syncronously per default but that
+  /// Middleware setting, middleware runs synchronously per default but that
   /// behaviour can be changed so that some middleware classes are allowed
   /// to run asynchronously. Set [async] to true in your middleware if you
   /// want it to run asynchronously.
@@ -84,13 +110,13 @@ class Vane {
   /// comes in the list, if it does, then all async middleware will be waited
   /// on before the next sync or async middleware is started.
   ///
+  /// For demonstrative purposes [Timer] simulates a big workload for the example middlewares.
+  ///
   /// Example of middleware that runs synchronously (default behaviour):
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new SyncExample());
-  ///         pre.add(new SyncExample());
-  ///       }
+  ///       var pipeline = [SyncExample, SyncExample, This];
   ///
+  ///       @Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
@@ -100,7 +126,7 @@ class Vane {
   ///     class SyncExample extends Vane {
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in sync!');
+  ///           log.info('Running synchronously!');
   ///           next();
   ///         });
   ///
@@ -111,11 +137,9 @@ class Vane {
   ///
   /// Example of middleware that runs asynchronously:
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new AsyncExample());
-  ///         pre.add(new AsyncExample());
-  ///       }
+  ///       var pipeline = [AsyncExample, AsyncExample, This];
   ///
+  ///       @Route("/")
   ///       Future main() {
   ///         log.info("Inside TestClass");
   ///         return close();
@@ -123,11 +147,11 @@ class Vane {
   ///     }
   ///
   ///     class AsyncExample extends Vane {
-  ///       bool async = true;
+  ///       var async = true;
   ///
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in async!');
+  ///           log.info('Running asynchronously!');
   ///           next();
   ///         });
   ///
@@ -156,7 +180,7 @@ class Vane {
   ///     class EndExample1 extends Vane {
   ///       Future main() {
   ///         new Timer(new Duration(seconds: 1), () {
-  ///           log.info('Running in sync!');
+  ///           log.info('Running synchronously!');
   ///           close();
   ///         });
   ///
@@ -167,7 +191,7 @@ class Vane {
   /// Example 2:
   ///     class EndExample2 extends Vane {
   ///       Future main() {
-  ///         log.info('Running in sync!');
+  ///         log.info('Running synchronously!');
   ///         return close();
   ///       }
   ///     }
@@ -249,57 +273,62 @@ class Vane {
   ///
   /// Example class:
   ///     class SessionTestClass extends Vane {
-  ///       Future main() {
-  ///         session["name"] = query["name"];
-  ///         print('Hello ${session["name"]}');
-  ///         write('Hello ${session["name"]}');
-  ///         return close();
+  ///       @Route("/")
+  ///       Future get(String name) {
+  ///         return close("Hello ${session["name"]}");
+  ///       }
+  ///
+  ///       @Route("/{?name}")
+  ///       Future set(String name) {
+  ///         session["name"] = name;
+  ///         return close("Hello ${session["name"]}");
   ///       }
   ///     }
   ///
   /// Set name with:
-  ///     curl http://[appname].[user].dartblob.com/[handler]?name=World
+  ///     curl "http://localhost:9090/?name=World"
   ///
   /// See value getting fetched from session:
-  ///     curl http://[appname].[user].dartblob.com/[handler]
+  ///     curl "http://localhost:9090/"
   ///
   Map<String, Object> get session => _VaneCore.session;
 
-  /// Path paramters
+  /// Path parameters
   ///
-  /// Parsed decoded path paramters from the request.
+  /// Parsed decoded path parameters from the request.
   ///
   /// Example:
   ///     class PathTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${path[0]}');
-  ///         write('Hello ${path[0]}');
-  ///         return close();
+  ///         var msg = path.length > 0 ? path[0] : "";
+  ///         log.info("Hello $msg");
+  ///         return close("Hello $msg");
   ///       }
   ///     }
   ///
   /// Test url:
-  ///     curl http://[appname].[user].dartblob.com/[handler]/[yourName]
+  ///     curl "http://localhost:9090/World"
   ///
   /// Note: This is a shorthand for req.uri.pathSegments
   ///
   List<String> get path => _core.req.uri.pathSegments;
 
-  /// Query paramters
+  /// Query parameters
   ///
-  /// Parsed decoded query paramters from the request.
+  /// Parsed decoded query parameters from the request.
   ///
   /// Example:
   ///     class QueryTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${query["name"]}');
-  ///         write('Hello ${query["name"]}');
-  ///         return close();
+  ///         log.info("Hello ${query["name"]}");
+  ///         return close("Hello ${query["name"]}");
   ///       }
   ///     }
   ///
   /// Test url:
-  ///     curl http://[appname].[user].dartblob.com/[handler]?name=World
+  ///     curl "http://localhost:9090/?name=World"
   ///
   /// Note: This is a shorthand for req.uri.queryParameters
   ///
@@ -313,21 +342,21 @@ class Vane {
   ///
   HttpRequestBody get body => _core.body;
 
-  /// POST paramters
+  /// POST parameters
   ///
-  /// Parsed query paramters from the request.
+  /// Parsed query parameters from the request.
   ///
   /// Example:
   ///     class ParamsTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${params["name"]}');
-  ///         write('Hello ${params["name"]}');
-  ///         return close();
+  ///         log.info("Hello ${params["name"]}");
+  ///         return close("Hello ${params["name"]}");
   ///       }
   ///     }
   ///
   /// Test url:
-  ///     curl -XPOST --data 'name=world' 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl -X POST --data "name=world" "http://localhost:9090/"
   ///
   Map<String, String> get params {
     if(_core.params == null) {
@@ -339,19 +368,19 @@ class Vane {
 
   /// Parsed JSON body
   ///
-  /// A map of json paramters sent in the body of a request.
+  /// A map of json parameters sent in the body of a request.
   ///
   /// Example:
   ///     class JsonTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
-  ///         print('Hello ${json["name"]}');
-  ///         write('Hello ${json["name"]}');
-  ///         return close();
+  ///         log.info('Hello ${json["name"]}');
+  ///         return close("Hello ${json["name"]}");
   ///       }
   ///     }
   ///
   /// Test url:
-  ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' "http://localhost:9090/"
   ///
   Map get json {
     if(_core.json == null) {
@@ -367,6 +396,7 @@ class Vane {
   ///
   /// Example:
   ///     class FilesTestClass extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         print(files["fileupload"].filename);
   ///         print('Content type = ${files["fileupload"].contentType}');
@@ -383,7 +413,7 @@ class Vane {
   ///     }
   ///
   /// Test url:
-  ///     curl --form "fileupload=@[path_to_file]" 'http://[appname].[user].dartblob.com/[handler]'
+  ///     curl --form "fileupload=@README.md" "http://localhost:9090/"
   ///
   Map<String, dynamic> get files {
     if(_core.files == null) {
@@ -402,15 +432,25 @@ class Vane {
   ///
   /// Example of a websocket echo service:
   ///     class WebsocketEchoClass extends Vane {
+  ///       @Route("/ws")
   ///       Future main() {
   ///         var conn = ws.listen(null);
-  ///         conn.onData((data) => ws.add("Echo: $data"));
+  ///
+  ///         conn.onData((data) {
+  ///           log.info(data);
+  ///           ws.add("Echo: $data");
+  ///         });
+  ///
   ///         conn.onError((e) => log.warning(e));
-  ///         conn.onDone((_) => close());
+  ///         conn.onDone(() => close());
   ///
   ///         return end;
   ///       }
   ///     }
+  ///
+  /// Connect to the websocket server through a test client:
+  ///     http://www.websocket.org/echo.html
+  ///     ws://localhost:9090/ws
   ///
   WebSocket get ws {
     if(_core.ws == null) {
@@ -434,6 +474,7 @@ class Vane {
   ///
   /// Connect to mongodb and add an entry:
   ///     class MongodbInsertExample extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         var name = "world";
   ///
@@ -448,6 +489,7 @@ class Vane {
   ///
   /// Connect to mongodb and get all entries:
   ///     class MongodbFetchExample extends Vane {
+  ///       @Route("/")
   ///       Future main() {
   ///         mongodb.then((mongodb) {
   ///           DbCollection coll = mongodb.collection("testCollection");
@@ -490,7 +532,7 @@ class Vane {
     return c.future;
   }
 
-  /// Process request and setup vane core paramters.
+  /// Process request and setup vane core parameters.
   Future _processRequest() {
     var c = new Completer();
 
@@ -725,11 +767,9 @@ class Vane {
   ///
   /// Example with pre middleware that uses [next]:
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre.add(new TestMiddlewareDoesNotClose());
-  ///         pre.add(new TestMiddlewareDoesNotClose());
-  ///       }
+  ///       var pipeline = [TestMiddlewareDoesNotClose, TestMiddlewareDoesNotClose, This];
   ///
+  ///       Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
@@ -739,11 +779,9 @@ class Vane {
   /// Example with pre middleware that uses [close] (the request will only
   /// reach the first middleware class since it uses [close]):
   ///     class TestClass extends Vane {
-  ///       void init() {
-  ///         pre(new TestMiddlewareThatDoClose());
-  ///         pre(new TestMiddlewareDoesNotClose());
-  ///       }
+  ///       var pipeline = [TestMiddlewareThatDoClose, TestMiddlewareDoesNotClose, This];
   ///
+  ///       Route("/")
   ///       Future main() {
   ///         log.info('Inside TestClass');
   ///         return close();
@@ -865,7 +903,7 @@ class Vane {
                 case 24: return handler(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16], params[17], params[18], params[19], params[20], params[21], params[22], params[23], params[24]);
                 case 25: return handler(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16], params[17], params[18], params[19], params[20], params[21], params[22], params[23], params[24], params[25]);
                 default:
-                  log.info("Error, too many paramters for handler");
+                  log.info("Error, too many parameters for handler");
                   return main();
               }
             }
