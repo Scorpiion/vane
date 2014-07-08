@@ -49,6 +49,10 @@ class VaneResponse {
    */
   int get statusCode => _res.statusCode;
 
+  void set statusCode(int code) {
+    _res.statusCode = code;
+  }
+
   /**
    * The [Encoding] used when writing strings. Depending on the
    * underlying consumer this property might be mutable.

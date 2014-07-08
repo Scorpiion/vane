@@ -1,3 +1,7 @@
+### 0.5.1
+
+* Added statusCode setter
+
 ### 0.5.0+2
 
 * Updated text and fixed errors in README
