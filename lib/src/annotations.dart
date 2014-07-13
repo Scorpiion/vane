@@ -30,7 +30,7 @@ class _This {
 }
 
 /// [This] is a constant used to indentify the main handler in middleware
-/// pipeline. With [This] it's possible to define where in the pipelien the
+/// pipeline. With [This] it's possible to define where in the pipeline the
 /// main handler should go, per default that is last in the the pipeline.
 const This = const _This();
 
