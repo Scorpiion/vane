@@ -63,7 +63,7 @@ abstract class Tube {
 
   /// Close the tube.
   ///
-  /// Close the interal [StreamSink]. It'll return the [done] Future.
+  /// Close the internal [StreamSink]. It'll return the [done] Future.
   ///
   /// Note that if you close the tube you can't use it later in other handlers
   /// that is part of the same request.

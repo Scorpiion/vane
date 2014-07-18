@@ -17,7 +17,7 @@ class _VaneCore {
   /// VaneRequest
   VaneRequest req;
 
-  /// VaneRespose
+  /// VaneResponse
   VaneResponse res;
 
   /// Parsed request body
