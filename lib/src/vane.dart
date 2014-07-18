@@ -7,10 +7,10 @@ const int _NEXT_MIDDLEWARE = 2;
 const int _REDIRECT_RESPONSE = 3;
 
 class Vane {
-  /// Vane core shared by the main handler and all middlware classes
+  /// Vane core shared by the main handler and all middleware classes
   _VaneCore _core = new _VaneCore();
 
-  /// Completer used internally with middlware
+  /// Completer used internally with middleware
   Completer _vaneCompleter = new Completer();
 
   /// Internal variable used for pipeline placement, see [pFirst], [pLast],
@@ -32,10 +32,10 @@ class Vane {
 
   /// VaneRequest
   ///
-  /// Request object that contains parameters from the incomming request.
+  /// Request object that contains parameters from the incoming request.
   /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects parameters
   /// were some parts has been moved to top level in Vane such as parts
-  /// regarding the body of the request that is availble as easy to use objects
+  /// regarding the body of the request that is available as easy to use objects
   /// such as [session], [body], [json] and [params].
   ///
   /// For examples please see [session], [body], [json] and [params].
@@ -958,7 +958,7 @@ class Vane {
         // Redirect
         _core.res._res.redirect(Uri.parse(_core.redirect_url), status: _core.redirect_status);
       } else {
-        // Run registed postHook middleware, then complete with r
+        // Run registered postHook middleware, then complete with r
         _runMiddleware(_core, post).then((r) => c.complete(r));
       }
     });
@@ -1060,7 +1060,7 @@ class Vane {
 
   /// Init function for a handler or middleware class.
   ///
-  /// The init funciton is always executed before main runs and can be used to
+  /// The init function is always executed before main runs and can be used to
   /// setup different parts of your handler. You don't need to implement a
   /// init function if you don't need it, but if you want to use middleware
   /// they can only be registered inside the init function.
