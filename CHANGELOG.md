@@ -1,3 +1,26 @@
+
+### 0.5.2
+
+* Typo fixes by Victor Berchet
+* Fixed github issue #6
+* Added better logging, now possible to see when how Vane parses handlers and 
+  how it matches the correct handler. 
+  
+See parsing of handlers (only on startup)
+```dart
+void main() {
+  serve(logLevel: Level.FINE);
+}
+
+```
+
+See parsing of handlers (only on startup) and matching of requests (on each request) 
+```dart
+void main() {
+  serve(logLevel: Level.FINER);
+}
+```
+
 ### 0.5.1
 
 * Added statusCode setter
