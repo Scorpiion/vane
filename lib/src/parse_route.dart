@@ -17,7 +17,7 @@ Route parseRoute(InstanceMirror routeMirror, [Route baseRoute]) {
                         methods: methodMirrors.reflectee);
     } else {
       List<String> allMethods = new List();
-      List<String> methods;
+      List<String> methods = new List();
       String method;
 
       // Let parameter method override baseRoutes method
