@@ -20,10 +20,10 @@ Controllers scanControllers() {
       // Check if the class have a @Route annotation
       if(mirror.metadata.any((meta) => meta.reflectee is Route) == true) {
         if(mirror.isSubclassOf(VaneMirror)) {
-//          Logger.root.info("Adding vane controller ${realname(mirror)}");
+          Logger.root.fine("Adding vane controller ${realname(mirror)}");
           controllers.vaneControllers.add(mirror);
         } else {
-//          Logger.root.info("Adding podo controller ${realname(mirror)}");
+          Logger.root.fine("Adding podo controller ${realname(mirror)}");
           controllers.podoControllers.add(mirror);
         }
       } else {
@@ -35,10 +35,10 @@ Controllers scanControllers() {
           // Check if the method have a @Route annotation
           if(method.metadata.any((meta) => meta.reflectee is Route) == true) {
             if(mirror.isSubclassOf(VaneMirror)) {
-//              Logger.root.info("Adding vane controller ${realname(mirror)}");
+              Logger.root.fine("Adding vane controller ${realname(mirror)}");
               controllers.vaneControllers.add(mirror);
             } else {
-//              Logger.root.info("Adding podo controller ${realname(mirror)}");
+              Logger.root.fine("Adding podo controller ${realname(mirror)}");
               controllers.podoControllers.add(mirror);
             }
             break;
@@ -48,7 +48,7 @@ Controllers scanControllers() {
     } else if(mirror is MethodMirror) {
       // Check if the class have a @Route annotation
       if(mirror.metadata.any((meta) => meta.reflectee is Route) == true) {
-//        Logger.root.info("Adding func controller ${realname(mirror)}");
+        Logger.root.fine("Adding func controller ${realname(mirror)}");
         controllers.funcControllers.add(mirror);
       }
     }

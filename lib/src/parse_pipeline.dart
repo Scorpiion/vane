@@ -31,10 +31,10 @@ _Middlewares parsePipeline(ClassMirror controllerMirror) {
 
             if(middleware.isSubtypeOf(VaneMirror)) {
               if(foundThis == false) {
-//                Logger.root.info("Adding to pre list: ${pipelineEntry}");
+                Logger.root.fine("Adding to pre list: ${pipelineEntry}");
                 middlewares.pre.add(middleware);
               } else {
-//                Logger.root.info("Adding to post list: ${pipelineEntry}");
+                Logger.root.fine("Adding to post list: ${pipelineEntry}");
                 middlewares.post.add(middleware);
               }
             } else {

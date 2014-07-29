@@ -2,11 +2,9 @@
 
 part of vane;
 
-void serve() {
-  Router router = new Router();
-
+void serve({Level logLevel: Level.CONFIG}) {
   // Setup logger
-  Logger.root.level = Level.CONFIG;
+  Logger.root.level = logLevel;
   Logger.root.onRecord.listen((LogRecord rec) {
     if(rec.level == Level.SEVERE ||
        rec.level == Level.SHOUT ||
@@ -19,6 +17,10 @@ void serve() {
     }
   });
 
+  // Parse scan code for handlers and create a router
+  Router router = new Router();
+
+  // Serve incomming requests
   runZoned(() {
     // Server port assignment
     var portEnv = Platform.environment['PORT'];

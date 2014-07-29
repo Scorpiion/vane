@@ -22,13 +22,13 @@ class Router {
 
     // Check request uri against routes
     for(var route in routes) {
-//      if(route.type == _vane) {
-//        Logger.root.info("Checking vane controller: ${route.controller}.${route.method} with path ${route.parser.template}");
-//      } else if(route.type == _podo) {
-//        Logger.root.info("Checking podo controller: ${route.controller}.${route.method} with path ${route.parser.template}");
-//      } else {
-//        Logger.root.info("Checking func controller: ${route.method} with path ${route.parser.template}");
-//      }
+      if(route.type == _vane) {
+        Logger.root.finer("Checking vane controller: ${route.controller}.${route.method} with path ${route.parser.template}");
+      } else if(route.type == _podo) {
+        Logger.root.finer("Checking podo controller: ${route.controller}.${route.method} with path ${route.parser.template}");
+      } else {
+        Logger.root.finer("Checking func controller: ${route.method} with path ${route.parser.template}");
+      }
 
       // Only try to match the route if the http method match
       if(route.metaRoute.method == "" ||
