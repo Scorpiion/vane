@@ -1,4 +1,25 @@
 
+### 0.6.0
+
+* New proxy functionality to integrate Vane with pub serve for client requests.
+  With Vane 0.6.0 cross origin requests are no longer needed.
+  
+To use the proxy you need to seperate your client and server code in a "client" 
+and a "server" directory and have a simple app.yaml file in the app root dir. 
+Start by running "pub serve" in your client project's directory, let it use the 
+standard 8080 port. Then start your Vane server seperatly from the Dart Editor
+by right clicking "server.dart" and pressing "Run". Last but not least, go to
+http://127.0.0.1:9090/ and you can use Vane and pub serve together!
+
+To easily try out Vane 0.6.0, follow these instruction:
+- git clone https://github.com/DartVoid/Vane-Hello
+- Open in "Vane-Hello" in the Dart Editor 
+- Wait for the Editor to run pub get (if it don't run it yourself)
+- Right click server/server.dart and press "Run"
+- Right click client/index.html and press "Run in Dartium"
+- You can first try http://127.0.0.1:8080 , just to see that it is only the client-side that works
+- Now try http://127.0.0.1:9090 instead and both server-side and client-side will work! 
+
 ### 0.5.2
 
 * Typo fixes by Victor Berchet

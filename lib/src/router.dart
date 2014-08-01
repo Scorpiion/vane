@@ -9,11 +9,23 @@ class RouteMatch {
 
 class Router {
   Controllers controllers;
-  List<_VaneRoute> routes;
+  List<_VaneRoute> routes = new List<_VaneRoute>();
 
   Router() {
+    // Scan sourcecode for handlers
     controllers = scanControllers();
-    routes = generateRoutes(controllers);
+
+    // Add server routes
+    routes.addAll(generateServerRoutes(controllers));
+
+    // Add client routes if not in production mode (dev mode)
+    routes.addAll(generateClientRoutes());
+
+    // Sort routes
+    routes.sort();
+
+    // Reverse list so that the longest paths comes first
+    routes = new List.from(routes.reversed);
   }
 
   RouteMatch matchRequest(HttpRequest request) {
