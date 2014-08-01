@@ -12,13 +12,13 @@ by right clicking "server.dart" and pressing "Run". Last but not least, go to
 http://127.0.0.1:9090/ and you can use Vane and pub serve together!
 
 To easily try out Vane 0.6.0, follow these instruction:
-- git clone https://github.com/DartVoid/Vane-Hello
-- Open in "Vane-Hello" in the Dart Editor 
-- Wait for the Editor to run pub get (if it don't run it yourself)
-- Right click server/server.dart and press "Run"
-- Right click client/index.html and press "Run in Dartium"
-- You can first try http://127.0.0.1:8080 , just to see that it is only the client-side that works
-- Now try http://127.0.0.1:9090 instead and both server-side and client-side will work! 
+* git clone https://github.com/DartVoid/Vane-Hello
+* Open in "Vane-Hello" in the Dart Editor 
+* Wait for the Editor to run pub get (if it don't run it yourself)
+* Right click server/server.dart and press "Run"
+* Right click client/index.html and press "Run in Dartium"
+* You can first try http://127.0.0.1:8080 , just to see that it is only the client-side that works
+* Now try http://127.0.0.1:9090 instead and both server-side and client-side will work! 
 
 ### 0.5.2
 
