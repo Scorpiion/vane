@@ -33,7 +33,6 @@ class _VaneCore {
   static Map<String, Object> session = new Map<String, Object>();
 
   /// Mongodb session manager
-  static final _SessionManager sessionManager =
-      new _SessionManager(Platform.environment['MONGODB_URI']);
+  static final _SessionManager sessionManager = new _SessionManager();
 }
 

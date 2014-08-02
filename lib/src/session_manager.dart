@@ -2,6 +2,10 @@
 
 part of vane;
 
+// MongoDB URI, provided by enviroment, standard localhost or overridden in code
+String _MONGODB_URI = Platform.environment['MONGODB_URI'];
+String MONGODB_URI = _MONGODB_URI != null ? _MONGODB_URI : "mongodb://localhost:27017";
+
 /// Mongodb session manager
 ///
 /// Key tasks:
@@ -36,7 +40,11 @@ class _SessionManager {
   int _session_update;
 
   /// Setup default uri and session update if needed
-  _SessionManager([this._uri, this._session_update = _SESSION_UPDATE]) {
+  _SessionManager([this._session_update = _SESSION_UPDATE]) {
+    // Setup MongoDB connection uri
+    _uri = MONGODB_URI;
+
+    // Timer run run a session check regularly
     new Timer.periodic(new Duration(minutes: _session_update), checkSession);
   }
 
@@ -59,6 +67,12 @@ class _SessionManager {
         // Complete internal connected completer so that a concurrent request
         // that might be waiting know then the session is connected as well.
         pool[name].connected.complete();
+      }).catchError((error) {
+        // Remove session from pool
+        pool.remove(name);
+
+        // Log error (maybe handle this better?)
+        Logger.root.warning(error);
       });
     } else {
       // Wait to make sure sessions has been connected

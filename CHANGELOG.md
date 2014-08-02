@@ -1,4 +1,19 @@
 
+### 0.6.1
+
+* Fix MongoDB related issue #5, before we assumed there always was a MONGODB_URI 
+  enviroment variable, not optimal. Now we instead give the user three options;
+  if no enviroment variable is set, and no paramter is provided to serve(), then
+  we use the standard mongodb://localhost:27017 uri. If there is an enviroment variable
+  we will use that one, if the user want a different uri it is now also possible to
+  override the default uri with a named optional paramter to serve().
+
+Example using default mongodb://localhost:27017 uri:
+void main() => serve();
+
+Example overriding with named paramter:
+void main() => serve(mongoUri: "mongodb://127.0.0.1:37017");
+
 ### 0.6.0
 
 * New proxy functionality to integrate Vane with pub serve for client requests.

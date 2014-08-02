@@ -2,7 +2,8 @@
 
 part of vane;
 
-void serve({Level logLevel: Level.CONFIG}) {
+void serve({Level logLevel: Level.CONFIG,
+            String mongoUri: ""}) {
   // Setup logger
   Logger.root.level = logLevel;
   Logger.root.onRecord.listen((LogRecord rec) {
@@ -16,6 +17,11 @@ void serve({Level logLevel: Level.CONFIG}) {
       stdout.write('${rec.time} ${rec.level.name}${name}: ${rec.message}\n');
     }
   });
+
+  // Override MongoDB uri if provided
+  if(mongoUri != "") {
+    MONGODB_URI = mongoUri;
+  }
 
   // Parse scan code for handlers and create a router
   Router router = new Router();
