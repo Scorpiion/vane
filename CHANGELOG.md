@@ -1,4 +1,17 @@
 
+### 0.6.2
+
+* Changed behavior of logging by printing logging of proxied request to a different
+  log level, since it can be seen in the output of pub serve anyways. It can be seen 
+  in the server output if the default logging level is changed like this:
+
+```dart
+void main() {
+  serve(logLevel: Level.FINE);
+}
+
+```
+
 ### 0.6.1
 
 * Fix MongoDB related issue #5, before we assumed there always was a MONGODB_URI 
