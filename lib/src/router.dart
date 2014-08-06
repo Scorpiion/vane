@@ -127,7 +127,12 @@ class Router {
         break;
 
       case _podo:
-        Logger.root.info("Serving request ${match.match.input} with podo handler ${match.route.controller}.${match.route.method}");
+        // Only show logging of proxyed request in fine level
+        if(match.route.controller == "VaneClientProxy") {
+          Logger.root.fine("Serving request ${match.match.input} with podo handler ${match.route.controller}.${match.route.method}");
+        } else {
+          Logger.root.info("Serving request ${match.match.input} with podo handler ${match.route.controller}.${match.route.method}");
+        }
 
         // Create new instance of podo controller
         podoController = match.route.classMirror.newInstance(const Symbol(""), []);
