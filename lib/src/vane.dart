@@ -368,7 +368,7 @@ class Vane {
 
   /// Parsed JSON body
   ///
-  /// A map of json parameters sent in the body of a request.
+  /// A map or list of json parameters sent in the body of a request.
   ///
   /// Example:
   ///     class JsonTestClass extends Vane {
@@ -382,7 +382,7 @@ class Vane {
   /// Test url:
   ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' "http://localhost:9090/"
   ///
-  Map get json {
+  dynamic get json {
     if(_core.json == null) {
       _core.json = new Map();
     }
