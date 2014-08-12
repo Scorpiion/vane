@@ -15,6 +15,11 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:yaml/yaml.dart';
 
+// Export vane_model for server side application to avoid double imports,
+// client side applications can only import vane_model.dart and not vane.dart
+import 'vane_model.dart';
+export 'vane_model.dart';
+
 part 'src/req.dart';
 part 'src/res.dart';
 part 'src/vane_core.dart';
