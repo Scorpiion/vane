@@ -1,4 +1,8 @@
 
+### 0.6.3
+
+* Added first version of the new VaneModel implementation, documentation and tests
+
 ### 0.6.2
 
 * Changed behavior of logging by printing logging of proxied request to a different
