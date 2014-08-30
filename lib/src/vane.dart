@@ -813,14 +813,9 @@ class Vane {
       return close(data);
     }
 
-    // If data is present, write to ouputStream
+    // Send data on to tube to next middleware handler
     if(data != null) {
-      // JSON encode the data if it is of type List or Map, else write it as it is
-      if(data is Map || data is List) {
-        _core.iosink.write(JSON.encode(data));
-      } else {
-        _core.iosink.write(data);
-      }
+      _core.tube.send(data);
     }
 
     // Complete with res r

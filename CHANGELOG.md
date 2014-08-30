@@ -1,4 +1,10 @@
 
+### 0.6.4
+
+* Changed behavior of 'return next(data)', before data was written to the response
+  output, now we send the data on the Tube instead for processing in later stages
+  of the middleware pipe.
+
 ### 0.6.3
 
 * Added first version of the new VaneModel implementation, documentation and tests
