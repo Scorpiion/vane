@@ -39,6 +39,7 @@ class VMMS {
   }
 
   static bool isAssignableToBasic(ClassMirror cm) {
+    // At this point not implemented in dart2js, see row 278 in js_mirrors.dart
     return (cm.isAssignableTo(VMMS.typeMirrorInt) ||
             cm.isAssignableTo(VMMS.typeMirrorDouble) ||
             cm.isAssignableTo(VMMS.typeMirrorNum) ||

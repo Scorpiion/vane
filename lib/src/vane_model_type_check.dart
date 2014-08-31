@@ -15,6 +15,8 @@ class VaneModelTypeCheck {
 
   /// Is the mirror on a List
   bool get isList => cm.isSubtypeOf(VMMS.typeMirrorList);
+  // Note: [isSubtypeOf] is currently not not implemented in dart2js, see
+  // row 277 in js_mirrors.dart
 
   /// Is the mirror on a typed List (eg. List<int> or List<Podo>)
   bool get isListTyped => (isList == true &&
@@ -39,6 +41,8 @@ class VaneModelTypeCheck {
 
   /// Is the mirror on a Map
   bool get isMap => cm.isSubtypeOf(VMMS.typeMirrorMap);
+  // Note: [isSubtypeOf] is currently not not implemented in dart2js, see
+  // row 277 in js_mirrors.dart
 
   /// Is the mirror on a typed Map (eg. Map<String, String> or Map<String, Podo>)
   bool get isMapTyped => (isMap == true &&
