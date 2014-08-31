@@ -23,15 +23,6 @@ class VaneView extends PolymerElement {
   }
 
   load(Event event, DetailsElement detail, HtmlElement target) {
-
-    print(event);
-    print(target);
-    print(target.runtimeType);
-
-    if(target is HtmlElement) {
-      print("TRUE");
-    }
-
     // Do element native click on element
 //    target.click();
 
