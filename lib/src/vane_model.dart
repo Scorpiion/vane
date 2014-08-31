@@ -333,16 +333,29 @@ abstract class VaneModel {
 //             val.type.reflectedType == num ||
              val.type.isAssignableTo(listMirror) ||
              val.type.isAssignableTo(mapMirror)) {
-            // Add value to map
-            map[symbolString(key)] = mirror.getField(key).reflectee;
+            String mapKey = symbolString(key);
 
+            // Add value to map, remove Polymer Observable prefix if present
+            if(mapKey.startsWith("__\$")) {
+              map[mapKey.substring(3)] = mirror.getField(key).reflectee;
+            } else {
+              // Add value to map
+              map[mapKey] = mirror.getField(key).reflectee;
+            }
 
             // TODO: Add special case for DateTime ?!?!
 
-
           } else {
-            // Recursively add new map based on the member object
-            map[symbolString(key)] = modelToJson(mirror.getField(key).reflectee);
+            String mapKey = symbolString(key);
+
+            // Recursively add new map based on the member object, remove
+            // Polymer Observable prefix if present
+            if(mapKey.startsWith("__\$")) {
+              map[mapKey.substring(3)] = modelToJson(mirror.getField(key).reflectee);
+            } else {
+              // Add value to map
+              map[mapKey] = modelToJson(mirror.getField(key).reflectee);
+            }
           }
         }
       });
