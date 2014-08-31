@@ -3,6 +3,7 @@
 library vane_model;
 
 import 'dart:convert';
+@MirrorsUsed(symbols: 'VaneModel', override: '*')
 import 'dart:mirrors';
 
 import 'package:logging/logging.dart';
