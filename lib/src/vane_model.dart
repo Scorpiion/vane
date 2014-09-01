@@ -459,7 +459,7 @@ abstract class VaneModel {
         code.writeln('  }\n');
       } else {
         code.writeln('    return map;');
-        code.writeln('  }');
+        code.write('  }');
       }
 
       return code;
