@@ -171,9 +171,37 @@ abstract class VaneModel {
       throw("Unsupported datatype......");
     }
 
-    // Run jsonToModel, will run recursively on object if needed
-    return jsonToModel(json, model);
+    // Use either mirrors or predefined decode function
+    bool useMirr = false;
 
+    // TODO: Benchmark and see what is fastest, use try/catch or mirrors to see
+    // if an object has a _useMirrors() function.
+    try {
+      useMirr = model.useMirrors();
+    } catch(e) {
+      // If the object don't have a _useMirror function, it's not a VaneModel
+      // and we force using mirrors implementation
+      useMirr = true;
+    }
+
+    if(useMirr == true) {
+      // Run mirror based jsonToModel function, will run recursively on object
+      // if needed
+      return jsonToModel(json, model);
+    } else {
+      // Run code generated "factory" method (not a Dart built in factory since
+      // we can't use it as flexibly as a method)
+      var document;
+
+      // We support both json strings and map documents
+      if(json is String) {
+        document = JSON.decode(json);
+      } else {
+        document = json;
+      }
+
+      return model.fromDocument(document);
+    }
 
     /*
     // Validate data
@@ -195,6 +223,10 @@ abstract class VaneModel {
     */
   }
 
+  /// Function used by transformer in order to tell VaneModel that code has
+  /// been generated
+  bool useMirrors() => true;
+
   static void _validateAny(model) {
     if(VMMS.isBasicType(model)) {
       // Validate built type
@@ -206,7 +238,7 @@ abstract class VaneModel {
     }
   }
 
-  static String encode(Object object, {bool validate: true}) {
+  static String encode(Object model, {bool validate: true}) {
     // Validate data
     // TODO: Do we validate maps of models?
 //    if(validate == true) {
@@ -219,14 +251,14 @@ abstract class VaneModel {
 //    }
 
     // Encode to json format
-    return JSON.encode(object);
+    return JSON.encode(model);
   }
 
-  static Map document(VaneModel object) {
+  static Map document(VaneModel model) {
     // Validate models data
-    object.validate();
+//    model.validate();
 
-    return object.toJson();
+    return model.toJson();
   }
 
   Set<ConstraintViolation> validate() {
@@ -243,75 +275,11 @@ abstract class VaneModel {
   // TODO: Add special case for DateTime
   // https://code.google.com/p/dart/issues/detail?id=16628
 
-
-  static String transform(Object ob) {
-//    return '''  Map toJson() {
-//    Map map = new Map();
-//    map["aaa"] = this.aaa;
-//    map["bbb"] = this.bbb;
-//    return map;
-//  }''';
-
-
-    // Function to convert objects to a map representation
-    String convertObject(Object ob) {
-      InstanceMirror This = reflect(ob);
-      Map map = new Map();
-      StringBuffer code = new StringBuffer();
-
-      code.writeln('  Map toJson() {');
-      code.writeln('    Map map = new Map();');
-
-      This.type.declarations.forEach((Symbol key, DeclarationMirror val) {
-        if(val is VariableMirror) {
-          TypeMirror listMirror = reflectType(List);
-
-          if(VMMS.isBasicType(val.type.reflectedType)) {
-//          if(val.type.reflectedType == String ||
-//             val.type.reflectedType == int ||
-//             val.type.reflectedType == bool ||
-//             val.type.reflectedType == num) {
-            // For transformer
-            code.writeln('    map["${symbolString(key)}"] = this.${symbolString(key)};');
-          } else if(val.type.isAssignableTo(listMirror)) {
-            // Note: We use 'isAssignableTo()' here instead of just '==' because
-            // while 'val.type.reflectedType == List' does work on a list like
-            // 'List a = [1,2]' it does not work on 'List<int> a = [1,2]',
-            // 'isAssignableTo()' works in both cases.
-            code.writeln('    map["${symbolString(key)}"] = this.${symbolString(key)};');
-          }
-        }
-      });
-      code.writeln('    return map;');
-      code.writeln('  }');
-
-      return code.toString();
-    }
-
-    return convertObject(ob);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  /// Function to convert objects to a document/map representation that then is
+  /// converted into JSON by [JSON.encode]
   Map toJson() {
-    // Function to convert objects to a map representation
-    Map modelToJson(Object model) {
+    /// Function to convert objects to a document/map representation
+    Map modelToDocument(Object model) {
       InstanceMirror mirror = reflect(model);
       Map map = new Map();
 
@@ -320,42 +288,24 @@ abstract class VaneModel {
           TypeMirror listMirror = reflectType(List);
           TypeMirror mapMirror = reflectType(Map);
 
-          // TODO: Use same type check here as we do in decode?
-          //
-          //       if(mirror.isSubtypeOf(VaneModelMember.listMirrorT) == true ||
-          //          mirror.isSubtypeOf(VaneModelMember.mapMirrorT) == true) {
-          //
+          // Remove Polymer Observable prefix if present
+          String kv = symbolString(key);
+          if(kv.startsWith("__\$")) {
+            kv = kv.substring(3);
+          }
 
+          // Check type
           if(VMMS.isBasicType(val.type.reflectedType) ||
-//          if(val.type.reflectedType == String ||
-//             val.type.reflectedType == int ||
-//             val.type.reflectedType == bool ||
-//             val.type.reflectedType == num ||
              val.type.isAssignableTo(listMirror) ||
              val.type.isAssignableTo(mapMirror)) {
-            String mapKey = symbolString(key);
+            // Add value to map
+            map[kv] = mirror.getField(key).reflectee;
 
-            // Add value to map, remove Polymer Observable prefix if present
-            if(mapKey.startsWith("__\$")) {
-              map[mapKey.substring(3)] = mirror.getField(key).reflectee;
-            } else {
-              // Add value to map
-              map[mapKey] = mirror.getField(key).reflectee;
-            }
-
-            // TODO: Add special case for DateTime ?!?!
+            // TODO: Add special case for DateTime and Duration....
 
           } else {
-            String mapKey = symbolString(key);
-
-            // Recursively add new map based on the member object, remove
-            // Polymer Observable prefix if present
-            if(mapKey.startsWith("__\$")) {
-              map[mapKey.substring(3)] = modelToJson(mirror.getField(key).reflectee);
-            } else {
-              // Add value to map
-              map[mapKey] = modelToJson(mirror.getField(key).reflectee);
-            }
+            // Add value to map
+            map[kv] = modelToDocument(mirror.getField(key).reflectee);
           }
         }
       });
@@ -363,13 +313,170 @@ abstract class VaneModel {
       return map;
     }
 
-    // Run objectToJson, will run recursively on object if needed
-    return modelToJson(this);
+    // Run modelToDocument, will run recursively on object if needed
+    return modelToDocument(this);
   }
 
+  /// Generate code for transformer
+  static String transform(Object model) {
+    // Function to generate code to for json generation
+    StringBuffer modelToCode(Object model, StringBuffer code, bool fromDocument) {
+      InstanceMirror mirror = reflect(model);
+      String Model;
 
+      if(fromDocument == true) {
+        // Create an easier to use variable for the model name
+        Model = symbolString(mirror.type.simpleName);
 
+        // Check if we should use empty or model constructor
+        int constructor = VaneModelMirror.constructorTypeOnClassMirror(mirror.type);
 
+        code.writeln('  bool useMirrors() => false;\n');
+        code.writeln('  ${Model} fromDocument(Map document) {');
+        if(constructor == EMPTY_CONSTRUCTOR) {
+          code.writeln('    ${Model} This = new ${Model}();');
+        } else if(constructor == MODEL_CONSTRUCTOR) {
+          code.writeln('    ${Model} This = new ${Model}.model();');
+        } else {
+          throw new Exception("All VaneModels must have either an empty default constructor or empty \".model\" constructor, please add \"${Model}.model();\" to your model");
+        }
+      } else {
+        code.writeln('  Map toJson() {');
+        code.writeln('    Map map = new Map();');
+      }
+
+      // For each model member
+      mirror.type.declarations.forEach((Symbol key, DeclarationMirror val) {
+        if(val is VariableMirror) {
+          TypeMirror listMirror = reflectType(List);
+          TypeMirror mapMirror = reflectType(Map);
+
+          // Remove Polymer Observable prefix if present
+          String kv = symbolString(key);
+          if(kv.startsWith("__\$")) {
+            kv = kv.substring(3);
+          }
+
+          // Check type
+          if(VMMS.isBasicType(val.type.reflectedType)) {
+            if(fromDocument == true) {
+              // Write code
+              code.writeln('    This.${kv} = document["${kv}"];');
+            } else {
+              // Add value to map
+              code.writeln('    map["${kv}"] = this.${kv};');
+            }
+          } else if(val.type.isAssignableTo(listMirror)) {
+             if(fromDocument == true) {
+               // Check what type of list
+               if(VMMS.isBasicType(val.type.typeArguments[0].reflectedType)) {
+//                 print("Found typed basic list!");
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new List();');
+                 code.writeln('    }');
+                 code.writeln('    This.${kv}.addAll(document["${kv}"]);');
+               } else if(val.type.typeArguments[0] != VMMS.typeMirrorDynamic) {
+//                 print("Found typed model based list!");
+                 // Check if we should use empty or model constructor
+                 int constructor = VaneModelMirror.constructorTypeOnClassMirror(val.type.typeArguments[0]);
+
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new List();');
+                 code.writeln('    }');
+                 if(constructor == EMPTY_CONSTRUCTOR) {
+                   code.writeln('    This.${kv}.addAll(document["${kv}"].map((doc) => VaneModel.decode(doc, new ${val.type.typeArguments[0].reflectedType}())));');
+                 } else if(constructor == MODEL_CONSTRUCTOR) {
+                   code.writeln('    This.${kv}.addAll(document["${kv}"].map((doc) => VaneModel.decode(doc, new ${val.type.typeArguments[0].reflectedType}.model())));');
+                 } else {
+                   throw new Exception("All VaneModels must have either an empty default constructor or empty \".model\" constructor, please add \"${kv}.model();\" to your model");
+                 }
+               } else {
+//                 print("Found dynamic list!");
+                 // Since we don't know the type we don't try to create new
+                 // instances for items
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new List();');
+                 code.writeln('    }');
+                 code.writeln('    This.${kv}.addAll(document["${kv}"]);');
+               }
+             } else {
+               // Add value to map
+               code.writeln('    map["${kv}"] = this.${kv};');
+             }
+          } else if(val.type.isAssignableTo(mapMirror)) {
+             if(fromDocument == true) {
+               // Check what type of map
+               if(VMMS.isBasicType(val.type.typeArguments[1].reflectedType)) {
+//                 print("Found typed basic map!");
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new Map();');
+                 code.writeln('    }');
+                 code.writeln('    This.${kv}.addAll(document["${kv}"]);');
+               } else if(val.type.typeArguments[0] != VMMS.typeMirrorDynamic) {
+//                 print("Found typed model based map!");
+                 // Check if we should use empty or model constructor
+                 int constructor = VaneModelMirror.constructorTypeOnClassMirror(val.type.typeArguments[1]);
+
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new Map();');
+                 code.writeln('    }');
+
+                 if(constructor == EMPTY_CONSTRUCTOR) {
+                   code.writeln('    document["${kv}"].forEach((key, doc) => This.m2[key] = VaneModel.decode(doc, new ${val.type.typeArguments[1].reflectedType}()));');
+                 } else if(constructor == MODEL_CONSTRUCTOR) {
+                   code.writeln('    document["${kv}"].forEach((key, doc) => This.m2[key] = VaneModel.decode(doc, new ${val.type.typeArguments[1].reflectedType}.model()));');
+                 } else {
+                   throw new Exception("All VaneModels must have either an empty default constructor or empty \".model\" constructor, please add \"${kv}.model();\" to your model");
+                 }
+               } else {
+//                 print("Found dynamic map!");
+                 // Since we don't know the type we don't try to create new
+                 // instances for items
+                 code.writeln('    if(This.${kv} == null) {');
+                 code.writeln('      This.${kv} = new Map();');
+                 code.writeln('    }');
+                 code.writeln('    This.${kv}.addAll(document["${kv}"]);');
+               }
+             } else {
+               // Add value to map
+               code.writeln('    map["${kv}"] = this.${kv};');
+             }
+
+            // TODO: Add special case for DateTime and Duration....
+
+          } else {
+            if(fromDocument == true) {
+              code.writeln('    This.${kv} = document["${kv}"];');
+            } else {
+              code.writeln('    map["${kv}"] = this.${kv};');
+            }
+          }
+        }
+      });
+
+      if(fromDocument == true) {
+        code.writeln('    return This;');
+        code.writeln('  }\n');
+      } else {
+        code.writeln('    return map;');
+        code.writeln('  }');
+      }
+
+      return code;
+    }
+
+    // String buffer used to store generated code
+    StringBuffer code = new StringBuffer();
+
+    // Run modelToCode, will run recursively on object if needed
+    code = modelToCode(model, code, true);
+
+    // Run modelToCode, will run recursively on object if needed
+    code = modelToCode(model, code, false);
+
+    // Return the buffer as a string
+    return code.toString();
+  }
 }
 
 /// [ValidationException] is thrown if a class extending the [VaneModel] class
@@ -383,16 +490,4 @@ class ValidationException implements Exception {
 String symbolString(Symbol symbol) {
   return symbol.toString().split('"')[1];
 }
-
-void transformP(String s) {
-  bool doPrint;
-
-  doPrint = false;
-//  doPrint = true;
-
-  if(doPrint) {
-    print(s);
-  }
-}
-
 
