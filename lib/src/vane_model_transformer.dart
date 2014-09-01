@@ -1,22 +1,13 @@
 part of vane_transformer;
 
-/*
- * Algorithm to find where to insert toJson() function:
- *
- * 1. Find a row that contains "class" + "extends" + "VaneModel"
- * 2. Parse out the model class from said row, called Model here
- * 3. Continue until we find a row with "Model.model()"
- * 4. Insert toJson() function below "Model.model()"
- *
- */
+class Model {
+  String name;
+  int row;
+  String constructor;
+  List<String> code;
 
-      /// 1. Create a new temp dir, /tmp/model_62342336
-      /// 2. Add a pubspec.yaml based on imports in model.dart
-      /// 3. Run pub get
-      /// 4. Run a program with VaneModel.transform to get the generated code
-      ///      - Inside this function, double check if the model override
-      ///        toJson, then don't add a second toJson....
-
+  Model(this.name, this.constructor, this.row);
+}
 
 class VaneModelTransformer extends Transformer {
   final BarbackSettings _settings;
@@ -49,44 +40,63 @@ class VaneModelTransformer extends Transformer {
     transform.primaryInput.readAsString().then((String content) {
       var id = transform.primaryInput.id;
       List<String> lines = content.split('\n');
-      List<String> models = new List<String>();
+      List<Model> models = new List<Model>();
+
+      bool lookForConstructor = false;
 
       // Only run transformer on Dart files that contain VaneModel classes
       for(var i = 0; i < lines.length; i++) {
         // Order of checks based on probability of hits in content
-        if(lines[i].contains("extends") &&
-           lines[i].contains("VaneModel") &&
+        if(lines[i].contains("VaneModel") &&
+           lines[i].contains("extends") &&
            lines[i].contains("class")) {
           String model = lines[i].split('extends')[0].trim().split(' ')[1];
-          transform.logger.info('Found VaneModel class ${model}');
-          models.add(model);
+
+          // Save model
+          models.add(new Model(model, "", i + 1));
+
+          // Start looking for a model constructor
+          lookForConstructor = true;
+        }
+
+        // If we have found a model, we continue to look to see what constructor
+        // that model need. We have three alternatives, an empty constructor
+        // like "Foo();", or an empty model constructor like "Foo.model();" or
+        // if we don't find any constructor we assume it's an empty constructor.
+        if(lookForConstructor == true) {
+          if(lines[i].contains("${models.last.name}.model();")) {
+            models.last.constructor = ".model";
+            lookForConstructor = false;
+          }
         }
       }
 
       if(models.isEmpty) {
         c.complete(true);
         return new Future.value("");
+      } else {
+        transform.logger.info('Generating code for VaneModel classes: ${models.sublist(1).fold('${models[0].name}', (x, y) => "$x, ${y.name}")}');
       }
 
       // Create a copy of the code that we can use as a base for our generated
       // code that we later execute to produce the json serialization code.
       String codeGenerationCode = new String.fromCharCodes(content.codeUnits);
+      String delimit = "1592fec14205f706c94019a3bb82df25a6e9754f22ab845d102a137e3cbdfb08";
 
       // Add start of code generation code
-      codeGenerationCode = '${codeGenerationCode}\nvoid main() {';
+      codeGenerationCode = '${codeGenerationCode}\nvoid main() {  print("");';
+      final k = models.length - 1;
 
       // Add code for each declared model
-      for(var model in models) {
-        codeGenerationCode = '${codeGenerationCode}\n  print(VaneModel.transform(new ${model}.model()));';
+      for(var i = 0; i < models.length; i++) {
+        codeGenerationCode = '${codeGenerationCode}\n  print(VaneModel.transform(new ${models[i].name}${models[i].constructor}()));';
+        if(i < k) {
+          codeGenerationCode = '${codeGenerationCode}\n  print("${delimit}");';
+        }
       }
 
       // Add end of code generation code
       codeGenerationCode = '${codeGenerationCode}\n}\n\n';
-
-
-      print("--------------- codeGenerationCode ----------------------");
-      transform.logger.info(codeGenerationCode);
-      print("-------------------------------------");
 
       // Create a temp directory
       Directory modelDir = Directory.systemTemp.createTempSync('vane_model_');
@@ -100,6 +110,11 @@ class VaneModelTransformer extends Transformer {
           => l.contains("import 'package:")).forEach((line) {
         // Parse out the package name from the import string
         String pkgName = line.substring(16, line.length).split('/')[0];
+
+        // TODO: The best solution here is to use "network imports" like pub
+        // does in it's own isolates. We just have to get the port of barbacks
+        // server somehow. If we use those both the pubspec and running pub get
+        // might not be needed anymore.
 
         // Add dependency to pubspec.yaml
         if(pkgName == "vane") {
@@ -145,26 +160,28 @@ class VaneModelTransformer extends Transformer {
         return new Future.value("");
       }
 
+      // Delete temporary directory
+      modelDir.deleteSync(recursive: true);
+
       // Parse out code from stdout
       List<String> contentWithJson = content.split('\n');
 
-      for(var i = 0; i < contentWithJson.length; i++) {
-        // Order of checks based on probability of hits in content
-        if(contentWithJson[i].contains("extends") &&
-           contentWithJson[i].contains("VaneModel") &&
-           contentWithJson[i].contains("class")) {
-          String clazz = contentWithJson[i].split('extends')[0].trim().split(' ')[1];
+      // Loop over generated code and add it to the model classes
+      List<String> generatedCode = codeGen.stdout.toString().split(delimit);
+      for(var i = 0; i < generatedCode.length; i++) {
+        // Save generated code (and inherently it's length used below)
+        models[i].code = generatedCode[i].split('\n');
 
-          while(i < contentWithJson.length) {
-            i++;
+        // Calculate offset used to insert generated code, we add the original
+        // row the class was found at with the totalt amount of inserted row
+        // so far (the added rows from added generated code).
+        int offset = models.sublist(0, i).fold(0, (x, y) => x + y.code.length);
 
-            if(contentWithJson[i].contains('${clazz}.model()') == true) {
-              contentWithJson.insert(i + 1, '\n${codeGen.stdout}');
-              i = i + 1 + codeGen.stdout.length;
-              break;
-            }
-          }
-        }
+        // Add the original row to the offset
+        offset = offset + models[i].row;
+
+        // Add function used for Json encode/decode to the outputed code
+        contentWithJson.insertAll(offset, models[i].code);
       }
 
       // Write new code with json serialization code to build dir
@@ -177,34 +194,4 @@ class VaneModelTransformer extends Transformer {
     return c.future;
   }
 }
-
-
-
-
-
-// TODO: Delete vane_model dir
-// TODO: Check so that this class don't override implements
-// TODO: Check so that this class don't override toJson()
-// TODO: Handle outcommneted code
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
