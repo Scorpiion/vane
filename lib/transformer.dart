@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:barback/barback.dart';
+import "package:path/path.dart";
 
 part 'src/vane_model_transformer.dart';
 
