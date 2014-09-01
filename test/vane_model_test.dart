@@ -22,7 +22,7 @@ class NoExtends extends VaneModel {
   String b = "bbbbbbbbbbb";
 }
 
-void main_test() {
+void main() {
 
 //  List<NoExtends> myList = new List<NoExtends>()
 //      ..add(new NoExtends())
@@ -432,6 +432,7 @@ void main_test() {
   */
 
 
+  /*
   QQQQQQ q1 = new QQQQQQ();
 
 //  Map<String, ABC> m1 = new Map<String, ABC>();
@@ -475,6 +476,67 @@ void main_test() {
   print(q2.m2["aaa"]);
   print(q2.m2["bb"]);
   print("");
+*/
+
+
+
+
+
+
+  Podo2 p = new Podo2()
+    ..a = 42
+//    ..myMap = new Map<String, String>()
+    ..m1["111"] = "aaaaaa"
+    ..m1["222"] = "bbbbbb"
+    ..m1["333"] = "cccccc"
+    ..m2["AAAAAAAA"] = new Item()
+    ..m2["BBBBBBBB"] = new Item()
+    ..m2["CCCCCCCC"] = new Item()
+    ..b.add(1)
+    ..b.add(2)
+    ..b.add(3)
+//    ..c = new List<Item>()
+    ..c.add(new Item())
+    ..c.add(new Item())
+    ..c.add(new Item());
+
+  print("------------------------------------------------------------");
+  print(p);
+//  print(p.a);
+//  print(p.m1.runtimeType);
+//  print(p.m1);
+//  print(p.m2.runtimeType);
+//  print(p.m2);
+//  print(p.b.runtimeType);
+//  print(p.b);
+//  print(p.c.runtimeType);
+//  print(p.c);
+  print("------------------------------------------------------------");
+
+
+
+
+  print(VaneModel.transform(new Podo2()));
+  print(VaneModel.transform(new Item()));
+
+
+  print("\n");
+
+  print(VaneModel.encode(p));
+
+  Podo2 p3 = VaneModel.decode(VaneModel.encode(p), new Podo2());
+  print("------------------------------------------------------------");
+  print(p3);
+//  print(p3.a);
+//  print(p3.m1.runtimeType);
+//  print(p3.m1);
+//  print(p3.m2.runtimeType);
+//  print(p3.m2);
+//  print(p3.b.runtimeType);
+//  print(p3.b);
+//  print(p3.c.runtimeType);
+//  print(p3.c);
+  print("------------------------------------------------------------");
 
 
 
@@ -483,7 +545,73 @@ void main_test() {
 
 
 
+//  List model;
+//  String json;
+//  model.addAll(VaneModel.decode(json, new List<Item>()));
 }
+
+class Podo2 extends VaneModel {
+  int a;
+  List<int> b = new List<int>();
+  List<Item> c = new List<Item>();
+
+  Item myItem = new Item();
+
+  List ddd = [];
+
+  Map<String, String> m1 = new Map<String, String>();
+  Map<String, Item> m2 = new Map<String, Item>();
+}
+
+class Item extends VaneModel {
+  String data = "aaaaa";
+
+  Item();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// TODO: Add better error output for this:
+//class BadListModel extends VaneModel {
+//  List badList;
+//}
+
+
+
+
+
 
 class QQQQQQ extends VaneModel {
   Map<String, ABC> m1 = new Map<String, ABC>();
@@ -492,6 +620,7 @@ class QQQQQQ extends VaneModel {
 
 class ABC extends VaneModel {
   String data = "11111111111";
+  int int2 = 2;
 }
 
 class MapTest extends VaneModel {
@@ -499,16 +628,6 @@ class MapTest extends VaneModel {
 }
 
 
-class Podo2 extends VaneModel {
-  int a;
-  int b;
-
-//  List<int> c;
-//  List<int> c = new List();
-  List<int> c = new List<int>();
-
-  Podo3 cc;
-}
 
 class Podo3 extends VaneModel {
   int c;
@@ -657,7 +776,8 @@ class C {
   String cc = "CCCCCCCCCCCCCCCCCCCC";
 }
 
-class TestModel extends B with C {
+//class TestModel extends B with C {
+class TestModel extends VaneModel {
   String name;
   int age;
   Podo podo = new Podo();
@@ -670,6 +790,31 @@ class TestModel extends B with C {
 //  TestModel();
 
   TestModel.model();
+
+//  bool useMirrors() => false;
+//
+//  TestModel fromDocument(Map document) {
+//    TestModel This = new TestModel();
+//    This.name = document["name"];
+//    This.age = document["age"];
+//    if(This.myList == null) {
+//      This.myList = new List();
+//    }
+//    This.myList.addAll(document["myList"]);
+//    return This;
+//  }
+//
+//  Map toJson() {
+//    Map map = new Map();
+//    map["name"] = this.name;
+//    map["age"] = this.age;
+//    map["podo"] = this.podo;
+//    map["miniPodoWithDefault"] = this.miniPodoWithDefault;
+//    map["miniPodoWithoutDefault"] = this.miniPodoWithoutDefault;
+//    map["myList"] = this.myList;
+//    return map;
+//  }
+
 }
 
 
@@ -679,370 +824,8 @@ String symbolString(Symbol symbol) {
 }
 
 
+// TODO: Does inherience work?? For both encode and decode??? Only decode??
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void main() {
-  test('1. VaneModel.encode(new SimpleModel("Dart", 100))', () {
-    SimpleModel a = new SimpleModel("Dart", 100);
-    SimpleModel b = VaneModel.decode('{"name":"Dart","age":100}', new SimpleModel.model());
-
-    expect(VaneModel.encode(a), equals('{"name":"Dart","age":100}'));
-    expect(a.name, equals(b.name));
-    expect(a.age, equals(b.age));
-  });
-
-  test('2. VaneModel.decode(VaneModel.encode())', () {
-    SimpleModel a = new SimpleModel("Dart", 100);
-    SimpleModel b = VaneModel.decode(VaneModel.encode(new SimpleModel("Dart", 100)), new SimpleModel.model());
-
-    expect(a.name, equals(b.name));
-    expect(a.age, equals(b.age));
-  });
-
-  test('3. VaneModel.encode([new SimpleModel("Dart", 100), new SimpleModel("Dart", 100)])', () {
-    expect(VaneModel.encode([new SimpleModel("Dart", 100), new SimpleModel("Dart", 100)]),
-        equals('[{"name":"Dart","age":100},{"name":"Dart","age":100}]'));
-  });
-
-  test('4. Compare list [..] with decode(encode([..]))', () {
-    List<SimpleModel> l1 = new List<SimpleModel>()
-      ..add(new SimpleModel("Dart", 100))
-      ..add(new SimpleModel("Dart", 100));
-
-    List<SimpleModel> l2 = VaneModel.decode(VaneModel.encode(l1), new List<SimpleModel>());
-
-    for(var i = 0; i < l1.length; i++) {
-      expect(l1[i].name, equals(l2[i].name));
-      expect(l1[i].age, equals(l2[i].age));
-    }
-  });
-
-  test('5. VaneModel.decode(VaneModel.encode())', () {
-    var t1 = new MyTagClass()
-      ..name = "Aaaaaaaaaaaaaaa"
-      ..tags.add(new Tag("111111111"))
-      ..tags.add(new Tag("222222222"));
-    var t2 = VaneModel.decode(VaneModel.encode(t1), new MyTagClass());
-
-    expect(t1.name, equals(t2.name));
-
-    for(var i = 0; i < t1.tags.length; i++) {
-      expect(t1.tags[i].tag, equals(t2.tags[i].tag));
-      expect(t1.tags[i].selected, equals(t2.tags[i].selected));
-    }
-  });
-
-  test('6. VaneModel.decode(VaneModel.encode())', () {
-    var t1 = new MyTagClass()
-      ..name = "Aaaaaaaaaaaaaaa"
-      ..tags.add(new Tag("111111111"))
-      ..tags.add(new Tag("222222222"));
-    var t2 = VaneModel.decode(VaneModel.encode(t1), new MyTagClass());
-
-    expect(t1.name, equals(t2.name));
-    for(var i = 0; i < t1.tags.length; i++) {
-      expect(t1.tags[i].tag, equals(t2.tags[i].tag));
-      expect(t1.tags[i].selected, equals(t2.tags[i].selected));
-    }
-  });
-
-  test('7. VaneModel.decode(VaneModel.encode())', () {
-    var t1 = new MyTagClass()
-      ..name = "Aaaaaaaaaaaaaaa"
-      ..tags.add(new Tag("111111111"))
-      ..tags.add(new Tag("222222222"));
-
-    List<MyTagClass> l0 = new List<MyTagClass>()
-        ..add(t1)
-        ..add(t1)
-        ..add(t1);
-    List<MyTagClass> l1 = new List.from(l0);
-    List<MyTagClass> l2 = VaneModel.decode(VaneModel.encode(l0), new List<MyTagClass>());
-
-    for(var i = 0; i < l1.length; i++) {
-      for(var k = 0; k < l1[i].tags.length; k++) {
-        expect(l1[i].tags[k].tag,       equals(l2[i].tags[k].tag));
-        expect(l1[i].tags[k].selected,  equals(l2[i].tags[k].selected));
-      }
-    }
-  });
-
-  test('Top level list of String (List<String> data = new List<String>();) ', () {
-    var t2 = new StringListTest()
-      ..data.add("Vane as a server side framework")
-      ..data.add("Pure for CSS");
-
-    expect(VaneModel.encode(t2), equals(VaneModel.encode(VaneModel.decode(VaneModel.encode(t2), new StringListTest.model()))));
-  });
-
-  // Tests on basic lists maps of built in Dart types
-  group("Testing encode(x), decode(x), encode(decode(encode(x))) on top level", () {
-    group("String", () {
-      test("List", () {
-        List l = new List<String>()
-            ..add("Robert")
-            ..add("is")
-            ..add("testing")
-            ..add("list");
-
-        expect(VaneModel.encode(l), equals('["Robert","is","testing","list"]'));
-        expect(VaneModel.decode(VaneModel.encode(l), new List<String>()), equals(l));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(l), new List<String>())), equals('["Robert","is","testing","list"]'));
-      });
-
-      test("Map", () {
-        Map m = new Map<String, String>()
-          ..["user"] = "Robert"
-          ..["does"] = "testing"
-          ..["what"] = "maps";
-
-        expect(VaneModel.encode(m), equals('{"user":"Robert","does":"testing","what":"maps"}'));
-        expect(VaneModel.decode(VaneModel.encode(m), new Map<String, String>()), equals(m));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(m), new Map<String, String>())), equals('{"user":"Robert","does":"testing","what":"maps"}'));
-      });
-    });
-
-    group("Int", () {
-      test("List", () {
-        List l = new List<int>()
-            ..add(1)
-            ..add(2)
-            ..add(3);
-
-        expect(VaneModel.encode(l), equals('[1,2,3]'));
-        expect(VaneModel.decode(VaneModel.encode(l), new List<int>()), equals(l));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(l), new List<int>())), equals('[1,2,3]'));
-      });
-
-      test("Map", () {
-        Map m = {"1": 1, "2": 2, "3": 3};
-
-        expect(VaneModel.encode(m), equals('{"1":1,"2":2,"3":3}'));
-        expect(VaneModel.decode(VaneModel.encode(m), new Map()), equals(m));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(m), new Map())), equals('{"1":1,"2":2,"3":3}'));
-      });
-    });
-
-    group("Double", () {
-      test("List", () {
-        List l = new List<double>()
-            ..add(1.33)
-            ..add(2.66)
-            ..add(3.99);
-
-        expect(VaneModel.encode(l), equals('[1.33,2.66,3.99]'));
-        expect(VaneModel.decode(VaneModel.encode(l), new List<double>()), equals(l));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(l), new List<double>())), equals('[1.33,2.66,3.99]'));
-      });
-
-      test("Map", () {
-        Map m = {"1.33": 1.33, "2.66": 2.66, "3.99": 3.99};
-
-        expect(VaneModel.encode(m), equals('{"1.33":1.33,"2.66":2.66,"3.99":3.99}'));
-        expect(VaneModel.decode(VaneModel.encode(m), new Map()), equals(m));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(m), new Map())), equals('{"1.33":1.33,"2.66":2.66,"3.99":3.99}'));
-      });
-    });
-
-    group("Bool", () {
-      test("List", () {
-        List l = new List<bool>()
-            ..add(true)
-            ..add(false)
-            ..add(true);
-
-        expect(VaneModel.encode(l), equals('[true,false,true]'));
-        expect(VaneModel.decode(VaneModel.encode(l), new List<bool>()), equals(l));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(l), new List<bool>())), equals('[true,false,true]'));
-      });
-
-      test("Map", () {
-        Map m = {"true": true, "false": false, "true2": true};
-
-        expect(VaneModel.encode(m), equals('{"true":true,"false":false,"true2":true}'));
-        expect(VaneModel.decode(VaneModel.encode(m), new Map()), equals(m));
-        expect(VaneModel.encode(VaneModel.decode(VaneModel.encode(m), new Map())), equals('{"true":true,"false":false,"true2":true}'));
-      });
-    });
-  });
-
-  test('Public/private members', () {
-    MyPrivate mp = new MyPrivate()
-      ..pubName = "Robert"
-      .._priName = "The One";
-
-    expect(VaneModel.encode(mp), equals('{"pubName":"Robert"}'));
-  });
-}
-
-
-
-
-
-class MyPrivate extends VaneModel {
-  String pubName;
-  String _priName;
-
-  MyPrivate();
-
-  MyPrivate.model();
-
-  MyPrivate.fromJson(Map json) {
-    pubName = json["pubName"];
-  }
-
-  Map toJson() {
-    return {
-      "pubName": pubName
-    };
-  }
-}
-
-class SimpleModel extends VaneModel {
-  String name;
-  int age;
-
-  SimpleModel(this.name, this.age);
-
-  SimpleModel.model();
-}
-
-class SimpleModel3 extends VaneModel {
-  String name;
-  int age;
-
-//  List myList = [1,2,3,4,5];
-//  List<int> myIntList = [1,2,3,4,5];
-//  List<String> myStringList = ["aaa", "bbb", "ccc"];
-//  List<Podo> podoList = [new Podo(), new Podo(), new Podo()];
-
-  Map myMap = {"key": "value"};
-  Map<String, int> myIntMap = {"key": 1};
-
-  Podo podo = new Podo();
-
-  SimpleModel3(this.name, this.age);
-
-  SimpleModel3.model();
-}
-
-
-
-class MyTagClass extends VaneModel {
-  String name;
-  Tag superTag = new Tag("9999999999");
-  List<Tag> tags = new List<Tag>();
-
-  MyTagClass();
-
-  MyTagClass.model();
-}
-
-class Tag extends VaneModel {
-  String tag;
-  bool selected;
-
-  Tag(this.tag, [this.selected = false]);
-
-  Tag.model();
-}
-
-class StringListTest extends VaneModel {
-  List<String> data = new List<String>();
-
-  StringListTest();
-
-  StringListTest.model();
-}
-
-
-
-
-// TODO: Add values of type "double" to tests.....
 
 
