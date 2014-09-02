@@ -73,11 +73,16 @@ class VaneModelTransformer extends Transformer {
            lines[i].contains("class")) {
           String model = lines[i].split('extends')[0].trim().split(' ')[1];
 
-          // Save model
-          models.add(new Model(model, "", i + 1));
+          // Do a check for single line comments
+          bool comment = lines[i].split(model).first.contains('//');
 
-          // Start looking for a model constructor
-          lookForConstructor = true;
+          if(comment == false) {
+            // Save model
+            models.add(new Model(model, "", i + 1));
+
+            // Start looking for a model constructor
+            lookForConstructor = true;
+          }
         }
 
         // If we have found a model, we continue to look to see what constructor
