@@ -5,6 +5,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:mirrors';
 
+import 'package:observe/observe.dart';
+
 import 'package:unittest/unittest.dart';
 import 'package:vane/vane_model.dart';
 
@@ -479,6 +481,7 @@ void main() {
 */
 
 
+  /*
 
   Podo2 p = new Podo2()
     ..a = 42
@@ -535,7 +538,30 @@ void main() {
 //  print(p3.c);
   print("------------------------------------------------------------");
 
+*/
 
+
+
+
+
+
+  List<Item> l1 = toObservable(new List<Item>())
+      ..add(new Item())
+      ..add(new Item())
+      ..add(new Item());
+
+  String json = '[{"data":"aaaaa"},{"data":"aaaaa"},{"data":"aaaaa"}]';
+
+//  print(VaneModel.encode(l1));
+
+
+  List<Item> ll = new List<Item>();
+
+  print(VaneModel.decode(json, ll));
+  print(ll);
+  print(toObservable(ll));
+  print(VaneModel.encode(l1));
+  print(VaneModel.encode(toObservable(ll)));
 
 
 //  List model;
