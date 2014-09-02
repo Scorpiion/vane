@@ -91,17 +91,6 @@ class VaneView extends PolymerElement {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 class ViewRoute extends Comparable {
   String name;
   int hash;
