@@ -33,7 +33,7 @@ part of vane_model;
 abstract class VaneModel {
   static Validator _v = new Validator();
 
-  static dynamic decode(json, model, {bool validate: true}) {
+  static dynamic decode(json, model, {bool validate: true, bool observe: false}) {
     // Return correct type if we got empty json data (responses from APIs or
     // databases can be empty if no data was found for example)
     if(json is String) {
@@ -92,8 +92,13 @@ abstract class VaneModel {
             vmm.im.reflectee.add(model);
           }
 
-          // Return list
-          return vmm.im.reflectee;
+          // Return list, as observable if requested
+//          return vmm.im.reflectee;
+          if(observe == true) {
+            return toObservable(vmm.im.reflectee);
+          } else {
+            return vmm.im.reflectee;
+          }
         } else {
           throw("Expected list in json document but found ${document.runtimeType}");
         }
@@ -116,8 +121,13 @@ abstract class VaneModel {
             vmm.im.reflectee[key] = model;
           }
 
-          // Return map
-          return vmm.im.reflectee;
+          // Return map, as observable if requested
+//          return vmm.im.reflectee;
+          if(observe == true) {
+            return toObservable(vmm.im.reflectee);
+          } else {
+            return vmm.im.reflectee;
+          }
         } else {
           throw("Expected map in json document but found ${document.runtimeType}");
         }
@@ -144,6 +154,8 @@ abstract class VaneModel {
             var element;
 
             if(vmm.members[key].isBasic == true) {
+//              print("--> Before assigning base type, key = ${key}");
+
               // Use value directly from document if we expect a basic type
               element = document[key];
             } else {
@@ -165,7 +177,13 @@ abstract class VaneModel {
           }
         }
 
-        return vmm.im.reflectee;
+        // Return model, as observable if requested
+//          return vmm.im.reflectee;
+        if(observe == true) {
+          return toObservable(vmm.im.reflectee);
+        } else {
+          return vmm.im.reflectee;
+        }
       }
 
       throw("Unsupported datatype......");
@@ -187,7 +205,11 @@ abstract class VaneModel {
     if(useMirr == true) {
       // Run mirror based jsonToModel function, will run recursively on object
       // if needed
-      return jsonToModel(json, model);
+      if(observe == true) {
+        return toObservable(jsonToModel(json, model));
+      } else {
+        return jsonToModel(json, model);
+      }
     } else {
       // Run code generated "factory" method (not a Dart built in factory since
       // we can't use it as flexibly as a method)
@@ -200,7 +222,11 @@ abstract class VaneModel {
         document = json;
       }
 
-      return model.fromDocument(document);
+      if(observe == true) {
+        return toObservable(model.fromDocument(document));
+      } else {
+        return model.fromDocument(document);
+      }
     }
 
     /*
