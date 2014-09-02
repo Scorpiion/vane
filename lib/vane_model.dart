@@ -8,6 +8,7 @@ import 'dart:mirrors';
 
 import 'package:logging/logging.dart';
 import 'package:constrain/constrain.dart';
+import 'package:observe/observe.dart';
 
 part 'src/vane_model.dart';
 part 'src/vane_model_mirror.dart';
