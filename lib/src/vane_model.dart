@@ -446,7 +446,16 @@ abstract class VaneModel {
 
           } else {
             if(fromDocument == true) {
-              code.writeln('    This.${kv} = document["${kv}"];');
+              // Check if we should use empty or model constructor
+              int constructor = VaneModelMirror.constructorTypeOnClassMirror(val.type);
+
+              if(constructor == EMPTY_CONSTRUCTOR) {
+                code.writeln('    This.${kv} = VaneModel.decode(document["${kv}"], new ${val.type.reflectedType}());');
+              } else if(constructor == MODEL_CONSTRUCTOR) {
+                code.writeln('    This.${kv} = VaneModel.decode(document["${kv}"], new ${val.type.reflectedType}.model());');
+              } else {
+                throw new Exception("All VaneModels must have either an empty default constructor or empty \".model\" constructor, please add \"${kv}.model();\" to your model");
+              }
             } else {
               code.writeln('    map["${kv}"] = this.${kv};');
             }

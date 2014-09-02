@@ -9,13 +9,27 @@ class Model {
   Model(this.name, this.constructor, this.row);
 }
 
+/// Ignored lib imports that are not work together with dart:io
+final List<String> IGNORED_LIBS = [
+  "dart:html",
+  "package:polymer/polymer.dart",
+  "package:vane/vane_elements.dart"
+];
+
 class VaneModelTransformer extends Transformer {
   final BarbackSettings _settings;
 
-  // Only run on dart files and ignore file in vane
+  /// Only run on dart files and ignore files that are part of Vane itself.
+  ///
+  /// Later in apply we also add a special check to avoid copies of the files
+  /// with bad imports. Not sure where these come from but it seems when
+  /// building a web app with models in lib the file comes twice, one is it
+  /// should be and one with different incompatible imports, we ignore the
+  /// second.
   Future<bool> isPrimary(AssetId id) {
     if(id.extension == ".dart") {
-      if(id.path.contains('packages/vane') == false) {
+      if(id.path.contains('packages/vane') == false &&
+         id.path.contains('package:vane') == false) {
         return new Future.value(true);
       } else {
         return new Future.value(false);
@@ -46,6 +60,13 @@ class VaneModelTransformer extends Transformer {
 
       // Only run transformer on Dart files that contain VaneModel classes
       for(var i = 0; i < lines.length; i++) {
+        // Look for duplicate files with bad imports
+        if(lines[i].contains("import") &&
+           lines[i].contains("/packages/")) {
+          c.complete(true);
+          return new Future.value("");
+        }
+
         // Order of checks based on probability of hits in content
         if(lines[i].contains("VaneModel") &&
            lines[i].contains("extends") &&
@@ -83,6 +104,11 @@ class VaneModelTransformer extends Transformer {
       String codeGenerationCode = new String.fromCharCodes(content.codeUnits);
       String delimit = "1592fec14205f706c94019a3bb82df25a6e9754f22ab845d102a137e3cbdfb08";
 
+      // Add empty Observable class to let classes mixin and extends it. The
+      // Observable class is part of the ignored Polymer package.
+      codeGenerationCode = '${codeGenerationCode}\n\nabstract class Observable { }\n';
+      codeGenerationCode = '${codeGenerationCode}\n\nabstract class ChangeNotifier { }\n';
+
       // Add start of code generation code
       codeGenerationCode = '${codeGenerationCode}\nvoid main() {  print("");';
       final k = models.length - 1;
@@ -97,6 +123,9 @@ class VaneModelTransformer extends Transformer {
 
       // Add end of code generation code
       codeGenerationCode = '${codeGenerationCode}\n}\n\n';
+
+      // Remove any nonsupported imports
+      codeGenerationCode = codeGenerationCode.split('\n').map((s) => IGNORED_LIBS.any((lib) => s.contains(lib)) ? "" : s).join('\n');
 
       // Create a temp directory
       Directory modelDir = Directory.systemTemp.createTempSync('vane_model_');
