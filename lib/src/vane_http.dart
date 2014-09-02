@@ -7,12 +7,13 @@ abstract class VaneHttp {
   String resource = "/";
   Map<String, String> _header = new Map<String, String>();
 
-  static void get(String resource,
+  static Future<Response> get(String resource,
                     {list, map, model,
                     bool validate: true,
                     bool observe: false}) {
+    Completer c = new Completer();
     Map<String, String> header = new Map<String, String>();
-    http.BrowserClient client = new http.BrowserClient();
+    BrowserClient http = new BrowserClient();
     String jsonStart;
     String jsonEnd;
 
@@ -28,7 +29,7 @@ abstract class VaneHttp {
       throw("Either a ViewModel has to be provided via one of the named paramters list, map or ob (depending on the type used in the view)");
     }
 
-    client.get('${resource}', headers: header).then((res) {
+    http.get('${resource}', headers: header).then((res) {
       if(res.statusCode == 200) {
         // Setup correct model container type
         if(list != null) {
@@ -38,8 +39,15 @@ abstract class VaneHttp {
         } else {
           VaneModel.decode(res.body, model, observe: observe);
         }
+      } else {
+        print("VaneHttp: HTTP ${res.statusCode}: ${res.reasonPhrase}");
       }
+
+      // Return res
+      c.complete(res);
     });
+
+    return c.future;
   }
 }
 
