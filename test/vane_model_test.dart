@@ -480,9 +480,6 @@ void main() {
 
 
 
-
-
-
   Podo2 p = new Podo2()
     ..a = 42
 //    ..myMap = new Map<String, String>()
@@ -541,13 +538,15 @@ void main() {
 
 
 
-
-
-
-
 //  List model;
 //  String json;
 //  model.addAll(VaneModel.decode(json, new List<Item>()));
+}
+
+class ListItem {
+  int row;
+
+  ListItem(this.row);
 }
 
 class Podo2 extends VaneModel {
