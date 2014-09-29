@@ -11,9 +11,8 @@ import 'package:uri/uri.dart';
 import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler, VirtualDirectory;
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db;
-import 'package:shelf/shelf_io.dart' as shelf_io;
-import 'package:shelf_proxy/shelf_proxy.dart';
 import 'package:yaml/yaml.dart';
+import 'package:http/http.dart';
 
 // Export vane_model for server side application to avoid double imports,
 // client side applications can only import vane_model.dart and not vane.dart
