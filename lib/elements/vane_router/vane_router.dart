@@ -80,6 +80,15 @@ class VaneRouter extends PolymerElement {
         window.console.info('${rec.time} ${rec.level.name}${name}: ${rec.message}');
       }
     });
+
+    // TODO: Determine if this is a good place for this check or if we should
+    //       move it.
+    // During development (aka when not using a production port), redirect from
+    // 8080 to 9090 so client code is correctly served from Vane's proxy.
+    if(window.location.port == "8080") {
+      print("Detecting direct connection to pub, redirecting so we use vane's proxy instead... :8080 -> :9090");
+      window.location.assign(window.location.toString().replaceAll("8080", "9090"));
+    }
   }
 
   /*
