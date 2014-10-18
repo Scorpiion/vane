@@ -1,4 +1,9 @@
 
+### 0.6.5
+
+* Updated package versions
+* New proxy implementation
+
 ### 0.6.4
 
 * Changed behavior of 'return next(data)', before data was written to the response
