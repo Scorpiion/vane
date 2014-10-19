@@ -2,7 +2,7 @@ Vane
 =========
 
 Vane is server side framework written and optimized for the Dart programming 
-langauge. Vane comes bundled with a lightweight and performant middleware 
+language. Vane comes bundled with a lightweight and performant middleware 
 system and strives to provide commonly used parameters and objects in an easy
 to use manner such as query parameters or json body data. 
 
@@ -26,8 +26,8 @@ functions with the @Route annotation
 ### Vane handler 
 A vane handler is any class that extends the Vane class. When you extend the Vane class your 
 handler functions get access to many helpers and features that are part of the Vane framework.
-In a vane handler you have access to a set of top level helpers to makes life easier, some 
-example of these are a ready to use parsed version of incomming json data called "json". 
+In a vane handler you have access to a set of top level helpers to make life easier, some 
+example of these are a ready to use parsed version of incoming json data called "json". 
 
 A Vane class can either run on it's own or in a pipeline of a set of Vane controllers. When 
 mulitple a Vane controller is used in a pipeline to process a request those other than the 
@@ -39,9 +39,9 @@ call will be changed to a `close()` call). If you call `close()` that will end t
 even if there are middleware controllers that have yet not run.  
 
 Vane classes registered to as middleware can run either before or after 
-the main controller. Middleware controller can run synchronously or asynchronously and 
+the main controller. Middleware controllers can run synchronously or asynchronously and 
 you are guaranteed that they execute in the order you define. Per default middleware controllers
-run synchronously any the next controller only starts when the current one have finished. You
+run synchronously and the next controller only starts when the current one has finished. You
 can choose to run one or more middleware controllers in async and also combine both a set of 
 synchronous and asynchronous controller to create more complex pipelines for processing.
 
