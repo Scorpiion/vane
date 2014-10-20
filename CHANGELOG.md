@@ -1,4 +1,9 @@
 
+### 0.6.5+1
+
+* Added better error handling for when vane proxy can't reach an pub serve instance.
+* Merged pull request from @Gubaer fixing some typos in README.
+
 ### 0.6.5
 
 * Updated package versions
