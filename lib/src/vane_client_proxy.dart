@@ -34,6 +34,7 @@ class VaneClientProxy {
   /// Proxy request to pub
   void _proxyRequest(HttpRequest request, {bool spa: false, String path: "/"}) {
     Client client = new Client();
+    // TODO: Maybe make this url configurable
     Uri url = Uri.parse("http://127.0.0.1:8080");
 
     // Setup request url path
@@ -73,6 +74,10 @@ class VaneClientProxy {
         request.response.close();
         client.close();
       });
+    }).catchError((error) {
+      request.response.statusCode = 502;
+      request.response.write("Error: Could not proxy request to pub serve ${url} (pub serve instance, is it running?)\n");
+      request.response.close();
     });
   }
 }
