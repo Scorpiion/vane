@@ -18,17 +18,17 @@ List<_VaneRoute> generateClientRoutes() {
   pathList.removeLast();        // Removes "server"  of /server/server.dart
   appRoot = pathList.join("/"); // Join list again to get app root
 
-  // Parse app.yaml
+  // Parse dv.yaml
   String content;
   try {
-    var file = new File("${appRoot}/app.yaml");
+    var file = new File("${appRoot}/dv.yaml");
     content = file.readAsStringSync();
   } catch (error) {
-    Logger.root.warning("Could not find an app.yaml file in the application root, no client requests will be proxied");
+    Logger.root.warning("Could not find an dv.yaml file in the application root, no client requests will be proxied");
     return routes;
   }
 
-  // Parse app.yaml content
+  // Parse dv.yaml content
   var appConf = loadYaml(content);
 
   // For each client handler, add a new vane function handler route
