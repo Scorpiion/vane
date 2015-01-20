@@ -7,7 +7,10 @@ List<_VaneRoute> generateClientRoutes() {
   InstanceMirror VaneClientProxyMirror = reflect(new VaneClientProxy());
 
   // Check if we should serve client files or not (dev vs production)
-  if(Platform.environment['DART_PRODUCTION'] != null) {
+  // TODO: Remove special Windows check! See issue #18 @ Github:
+  //       https://github.com/DartVoid/Vane/issues/18
+  if(Platform.environment['DART_PRODUCTION'] != null ||
+     Platform.isWindows == true) {
     return routes;
   }
 
