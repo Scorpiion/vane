@@ -1,4 +1,7 @@
 
+### 0.6.5+3
+* Added a temporary fix for Windows that disables the client request proxy, currently blocked by issue #18 either way.
+
 ### 0.6.5+1
 
 * Added better error handling for when vane proxy can't reach an pub serve instance.
