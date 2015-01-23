@@ -2,7 +2,20 @@
 
 part of vane;
 
-void serve({Level logLevel: Level.CONFIG,
+/**
+ * Start serving requests.
+ *
+ * Regarding SSL support, consult the documentation of [SecureSocket.initialize]
+ * for information on the parameters.
+ */
+void serve({String host: "127.0.0.1",
+            int port: 9090,
+            String sslCertificateName,
+            String sslCertificateDatabase,
+            String sslCertificateDatabasePassword,
+            int sslPort: 9091,
+            bool sslOnly: false,
+            Level logLevel: Level.CONFIG,
             String mongoUri: ""}) {
   // Setup logger
   Logger.root.level = logLevel;
@@ -26,17 +39,17 @@ void serve({Level logLevel: Level.CONFIG,
   // Parse scan code for handlers and create a router
   Router router = new Router();
 
-  // Serve incomming requests
+  // Server port assignment
+  var portEnv = Platform.environment['PORT'];
+  port = portEnv != null ? int.parse(portEnv) : port;
+  var httpsPortEnv = Platform.environment['PORT_SSL'];
+  sslPort = httpsPortEnv != null ? int.parse(httpsPortEnv) : sslPort;
+
+  // Serve incoming requests
   runZoned(() {
-    // Server port assignment
-    var portEnv = Platform.environment['PORT'];
-    var port = portEnv != null ? int.parse(portEnv) : 9090;
-
-    Logger.root.info("Starting vane server: 127.0.0.1:${port}");
-
-    HttpServer.bind("127.0.0.1", port).then((server) {
+    // Function that sets up the server binding
+    Function serverBinding = (HttpServer server) {
       RouteMatch match;
-
       server.listen((HttpRequest request) {
         // See if we have a match for the request
         match = router.matchRequest(request);
@@ -49,7 +62,20 @@ void serve({Level logLevel: Level.CONFIG,
           request.response.close();
         }
       });
-    });
+    };
+
+    // Check if SSL is configured correctly and start HTTPS binding if so
+    if(sslCertificateName != null && sslCertificateDatabase != null && sslCertificateDatabasePassword != null) {
+      Logger.root.info("Starting Vane server on HTTPS: ${host}:${port}");
+      SecureSocket.initialize(database: sslCertificateDatabase, password: sslCertificateDatabasePassword);
+      HttpServer.bindSecure(host, sslPort, certificateName: sslCertificateName).then(serverBinding);
+    }
+
+    // Start regular HTTP binding
+    if(!sslOnly) {
+      Logger.root.info("Starting Vane server on HTTP: ${host}:${port}");
+      HttpServer.bind(host, port).then(serverBinding);
+    }
   },
   onError: (e, stackTrace) {
     Logger.root.warning(e.toString());
