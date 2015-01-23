@@ -7,6 +7,8 @@ part of vane;
  *
  * Regarding SSL support, consult the documentation of [SecureSocket.initialize]
  * for information on the parameters.
+ *
+ * If [redirectHTTP] is true, HTTP traffic will be redirected to HTTPS.
  */
 void serve({String host: "127.0.0.1",
             int port: 9090,
@@ -15,6 +17,7 @@ void serve({String host: "127.0.0.1",
             String sslCertificateDatabasePassword,
             int sslPort: 9091,
             bool sslOnly: false,
+            bool redirectHTTP: false,
             Level logLevel: Level.CONFIG,
             String mongoUri: ""}) {
   // Setup logger
@@ -69,10 +72,28 @@ void serve({String host: "127.0.0.1",
       Logger.root.info("Starting Vane server on HTTPS: ${host}:${port}");
       SecureSocket.initialize(database: sslCertificateDatabase, password: sslCertificateDatabasePassword);
       HttpServer.bindSecure(host, sslPort, certificateName: sslCertificateName).then(serverBinding);
+
+      // Redirect HTTP traffic to HTTPS when redirectHTTP is true
+      if(redirectHTTP) {
+        HttpServer.bind(host, port).then((HttpServer server) {
+          server.listen((HttpRequest request) {
+            Uri httpsUri = new Uri(scheme: "https",
+                userInfo: request.uri.userInfo,
+                host: request.uri.host,
+                port: request.uri.port,
+                path: request.uri.path,
+                pathSegments: request.uri.pathSegments,
+                query: request.uri.query,
+                queryParameters: request.uri.queryParameters,
+                fragment: request.uri.fragment);
+            request.response.redirect(httpsUri, status: HttpStatus.MOVED_PERMANENTLY);
+          });
+        });
+      }
     }
 
     // Start regular HTTP binding
-    if(!sslOnly) {
+    if(!sslOnly && !redirectHTTP) {
       Logger.root.info("Starting Vane server on HTTP: ${host}:${port}");
       HttpServer.bind(host, port).then(serverBinding);
     }
