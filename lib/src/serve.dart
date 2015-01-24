@@ -2,7 +2,24 @@
 
 part of vane;
 
-void serve({Level logLevel: Level.CONFIG,
+/**
+ * Start serving requests.
+ *
+ * Regarding SSL support, consult the documentation of [SecureSocket.initialize]
+ * for information on the parameters.
+ *
+ * If [redirectHTTP] is true, HTTP traffic will be redirected to HTTPS.
+ */
+void serve({String host,
+            int port,
+            bool enableTLS: false,
+            int tlsPort,
+            String tlsCertificateName,
+            String tlsCertificateDb,
+            String tlsCertificateDbPassword,
+            bool tlsOnly: false,
+            bool redirectHTTP: false,
+            Level logLevel: Level.CONFIG,
             String mongoUri: ""}) {
   // Setup logger
   Logger.root.level = logLevel;
@@ -26,17 +43,23 @@ void serve({Level logLevel: Level.CONFIG,
   // Parse scan code for handlers and create a router
   Router router = new Router();
 
-  // Serve incomming requests
+  // Server port assignment (parameter overwrites environment)
+  var hostEnv = Platform.environment['HOST'];
+  host = host != null ? host : (hostEnv != null ? hostEnv : "127.0.0.1");
+  var portEnv = Platform.environment['PORT'];
+  port = port != null ? port : portEnv != null ? int.parse(portEnv) : 80; // default HTTP port
+  var tlsPortEnv = Platform.environment['PORT_SSL'];
+  tlsPort = tlsPort != null ? tlsPort : tlsPortEnv != null ? int.parse(tlsPortEnv) : 443; // default HTTPS port
+  // SSL config using environment
+  tlsCertificateName = tlsCertificateName != null ? tlsCertificateName : Platform.environment['SSL_CERT_NAME'];
+  tlsCertificateDb = tlsCertificateDb != null ? tlsCertificateDb : Platform.environment['SSL_CERT_DB'];
+  tlsCertificateDbPassword = tlsCertificateDbPassword != null ? tlsCertificateDbPassword : Platform.environment['SSL_CERT_DB_PASS'];
+
+  // Serve incoming requests
   runZoned(() {
-    // Server port assignment
-    var portEnv = Platform.environment['PORT'];
-    var port = portEnv != null ? int.parse(portEnv) : 9090;
-
-    Logger.root.info("Starting vane server: 127.0.0.1:${port}");
-
-    HttpServer.bind("127.0.0.1", port).then((server) {
+    // Function that sets up the server binding
+    void serverBinding (HttpServer server) {
       RouteMatch match;
-
       server.listen((HttpRequest request) {
         // See if we have a match for the request
         match = router.matchRequest(request);
@@ -49,7 +72,34 @@ void serve({Level logLevel: Level.CONFIG,
           request.response.close();
         }
       });
-    });
+    };
+
+    // Check if SSL is configured correctly and start HTTPS binding if so
+    if(enableTLS == true) {
+      // Configuring SSL when all parameters are given
+      if(tlsCertificateName != null && tlsCertificateDb != null && tlsCertificateDbPassword != null) {
+        SecureSocket.initialize(database: tlsCertificateDb, password: tlsCertificateDbPassword);
+      }
+      Logger.root.info("Starting Vane server on HTTPS: ${host}:${tlsPort}");
+      HttpServer.bindSecure(host, tlsPort, certificateName: tlsCertificateName).then(serverBinding);
+
+      // Redirect HTTP traffic to HTTPS when redirectHTTP is true
+      if(redirectHTTP == true) {
+        Logger.root.info("Starting HTTP server to redirect to HTTPS on ${host}:${port}");
+        HttpServer.bind(host, port).then((HttpServer server) {
+          server.listen((HttpRequest request) {
+            Uri httpsUri = request.uri.replace(scheme: "https");
+            request.response.redirect(httpsUri, status: HttpStatus.MOVED_PERMANENTLY);
+          });
+        });
+      }
+    }
+
+    // Start regular HTTP binding
+    if(tlsOnly == false && redirectHTTP == false) {
+      Logger.root.info("Starting Vane server on HTTP: ${host}:${port}");
+      HttpServer.bind(host, port).then(serverBinding);
+    }
   },
   onError: (e, stackTrace) {
     Logger.root.warning(e.toString());
