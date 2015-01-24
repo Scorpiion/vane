@@ -12,10 +12,11 @@ part of vane;
  */
 void serve({String host: "127.0.0.1",
             int port: 9090,
+            bool enableSSL: false,
+            int sslPort: 9091,
             String sslCertificateName,
             String sslCertificateDatabase,
             String sslCertificateDatabasePassword,
-            int sslPort: 9091,
             bool sslOnly: false,
             bool redirectHTTP: false,
             Level logLevel: Level.CONFIG,
@@ -42,11 +43,18 @@ void serve({String host: "127.0.0.1",
   // Parse scan code for handlers and create a router
   Router router = new Router();
 
-  // Server port assignment
-  var portEnv = Platform.environment['PORT'];
-  port = portEnv != null ? int.parse(portEnv) : port;
-  var httpsPortEnv = Platform.environment['PORT_SSL'];
-  sslPort = httpsPortEnv != null ? int.parse(httpsPortEnv) : sslPort;
+  // Server port assignment (parameter overwrites environment)
+  if(port == null)
+    port = int.parse(Platform.environment['PORT']);
+  if(sslPort = null)
+    sslPort = int.parse(Platform.environment['PORT_SSL']);
+  // SSL config using environment
+  if(sslCertificateName == null)
+    sslCertificateName = Platform.environment['SSL_CERT_NAME'];
+  if(sslCertificateDatabase == null)
+    sslCertificateDatabase = Platform.environment['SSL_CERT_DB'];
+  if(sslCertificateDatabasePassword == null)
+    sslCertificateDatabasePassword = Platform.environment['SSL_CERT_DB_PASS'];
 
   // Serve incoming requests
   runZoned(() {
@@ -68,9 +76,12 @@ void serve({String host: "127.0.0.1",
     };
 
     // Check if SSL is configured correctly and start HTTPS binding if so
-    if(sslCertificateName != null && sslCertificateDatabase != null && sslCertificateDatabasePassword != null) {
+    if(enableSSL) {
+      // Configuring SSL when all parameters are given
+      if(sslCertificateName != null && sslCertificateDatabase != null && sslCertificateDatabasePassword != null) {
+        SecureSocket.initialize(database: sslCertificateDatabase, password: sslCertificateDatabasePassword);
+      }
       Logger.root.info("Starting Vane server on HTTPS: ${host}:${port}");
-      SecureSocket.initialize(database: sslCertificateDatabase, password: sslCertificateDatabasePassword);
       HttpServer.bindSecure(host, sslPort, certificateName: sslCertificateName).then(serverBinding);
 
       // Redirect HTTP traffic to HTTPS when redirectHTTP is true
