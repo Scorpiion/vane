@@ -10,14 +10,14 @@ part of vane;
  *
  * If [redirectHTTP] is true, HTTP traffic will be redirected to HTTPS.
  */
-void serve({String host: "127.0.0.1",
-            int port: 9090,
-            bool enableSSL: false,
-            int sslPort: 9091,
-            String sslCertificateName,
-            String sslCertificateDatabase,
-            String sslCertificateDatabasePassword,
-            bool sslOnly: false,
+void serve({String host,
+            int port,
+            bool enableTLS: false,
+            int tlsPort,
+            String tlsCertificateName,
+            String tlsCertificateDb,
+            String tlsCertificateDbPassword,
+            bool tlsOnly: false,
             bool redirectHTTP: false,
             Level logLevel: Level.CONFIG,
             String mongoUri: ""}) {
@@ -44,22 +44,21 @@ void serve({String host: "127.0.0.1",
   Router router = new Router();
 
   // Server port assignment (parameter overwrites environment)
-  if(port == null)
-    port = int.parse(Platform.environment['PORT']);
-  if(sslPort = null)
-    sslPort = int.parse(Platform.environment['PORT_SSL']);
+  var hostEnv = Platform.environment['HOST'];
+  host = host != null ? host : (hostEnv != null ? hostEnv : "127.0.0.1");
+  var portEnv = Platform.environment['PORT'];
+  port = port != null ? port : portEnv != null ? int.parse(portEnv) : 80; // default HTTP port
+  var tlsPortEnv = Platform.environment['PORT_SSL'];
+  tlsPort = tlsPort != null ? tlsPort : tlsPortEnv != null ? int.parse(tlsPortEnv) : 443; // default HTTPS port
   // SSL config using environment
-  if(sslCertificateName == null)
-    sslCertificateName = Platform.environment['SSL_CERT_NAME'];
-  if(sslCertificateDatabase == null)
-    sslCertificateDatabase = Platform.environment['SSL_CERT_DB'];
-  if(sslCertificateDatabasePassword == null)
-    sslCertificateDatabasePassword = Platform.environment['SSL_CERT_DB_PASS'];
+  tlsCertificateName = tlsCertificateName != null ? tlsCertificateName : Platform.environment['SSL_CERT_NAME'];
+  tlsCertificateDb = tlsCertificateDb != null ? tlsCertificateDb : Platform.environment['SSL_CERT_DB'];
+  tlsCertificateDbPassword = tlsCertificateDbPassword != null ? tlsCertificateDbPassword : Platform.environment['SSL_CERT_DB_PASS'];
 
   // Serve incoming requests
   runZoned(() {
     // Function that sets up the server binding
-    Function serverBinding = (HttpServer server) {
+    void serverBinding (HttpServer server) {
       RouteMatch match;
       server.listen((HttpRequest request) {
         // See if we have a match for the request
@@ -76,27 +75,20 @@ void serve({String host: "127.0.0.1",
     };
 
     // Check if SSL is configured correctly and start HTTPS binding if so
-    if(enableSSL) {
+    if(enableTLS == true) {
       // Configuring SSL when all parameters are given
-      if(sslCertificateName != null && sslCertificateDatabase != null && sslCertificateDatabasePassword != null) {
-        SecureSocket.initialize(database: sslCertificateDatabase, password: sslCertificateDatabasePassword);
+      if(tlsCertificateName != null && tlsCertificateDb != null && tlsCertificateDbPassword != null) {
+        SecureSocket.initialize(database: tlsCertificateDb, password: tlsCertificateDbPassword);
       }
-      Logger.root.info("Starting Vane server on HTTPS: ${host}:${port}");
-      HttpServer.bindSecure(host, sslPort, certificateName: sslCertificateName).then(serverBinding);
+      Logger.root.info("Starting Vane server on HTTPS: ${host}:${tlsPort}");
+      HttpServer.bindSecure(host, tlsPort, certificateName: tlsCertificateName).then(serverBinding);
 
       // Redirect HTTP traffic to HTTPS when redirectHTTP is true
-      if(redirectHTTP) {
+      if(redirectHTTP == true) {
+        Logger.root.info("Starting HTTP server to redirect to HTTPS on ${host}:${port}");
         HttpServer.bind(host, port).then((HttpServer server) {
           server.listen((HttpRequest request) {
-            Uri httpsUri = new Uri(scheme: "https",
-                userInfo: request.uri.userInfo,
-                host: request.uri.host,
-                port: request.uri.port,
-                path: request.uri.path,
-                pathSegments: request.uri.pathSegments,
-                query: request.uri.query,
-                queryParameters: request.uri.queryParameters,
-                fragment: request.uri.fragment);
+            Uri httpsUri = request.uri.replace(scheme: "https");
             request.response.redirect(httpsUri, status: HttpStatus.MOVED_PERMANENTLY);
           });
         });
@@ -104,7 +96,7 @@ void serve({String host: "127.0.0.1",
     }
 
     // Start regular HTTP binding
-    if(!sslOnly && !redirectHTTP) {
+    if(tlsOnly == false && redirectHTTP == false) {
       Logger.root.info("Starting Vane server on HTTP: ${host}:${port}");
       HttpServer.bind(host, port).then(serverBinding);
     }
