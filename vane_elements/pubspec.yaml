@@ -1,0 +1,7 @@
+name: vane_elements
+version: 0.6.6
+authors: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
+dependencies:
+  uri: ">=0.9.5 <0.10.0"
+  polymer: ">=0.16.0+7 <0.17.0"
+
