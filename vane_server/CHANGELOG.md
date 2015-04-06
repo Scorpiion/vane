@@ -2,6 +2,7 @@
 ### 0.7.0
 
 * First version as a seperate package, vane is being splitted up into multiple packages.
+* Change default port from 9090 to 8080 (breaking change).
 
 ### 0.6.5+3
 * Added a temporary fix for Windows that disables the client request proxy, currently blocked by issue #18 either way.

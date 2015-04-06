@@ -2,7 +2,12 @@
 
 part of vane;
 
-void serve({Level logLevel: Level.CONFIG,
+const String _DEFAULT_ADDRESS = "0.0.0.0";
+const int _DEFAULT_PORT       = 8080;
+
+void serve({String address: _DEFAULT_ADDRESS,
+            int port: _DEFAULT_PORT,
+            Level logLevel: Level.CONFIG,
             String mongoUri: ""}) {
   // Setup logger
   Logger.root.level = logLevel;
@@ -29,12 +34,14 @@ void serve({Level logLevel: Level.CONFIG,
   // Serve incomming requests
   runZoned(() {
     // Server port assignment
+    var addressEnv = Platform.environment['ADDRESS'];
     var portEnv = Platform.environment['PORT'];
-    var port = portEnv != null ? int.parse(portEnv) : 9090;
+    var finalAddress = portEnv != null ? int.parse(addressEnv) : address;
+    var finalPort = portEnv != null ? int.parse(portEnv) : port;
 
-    Logger.root.info("Starting vane server: 127.0.0.1:${port}");
+    Logger.root.info("Starting vane server: ${finalAddress}:${finalPort}");
 
-    HttpServer.bind("127.0.0.1", port).then((server) {
+    HttpServer.bind(finalAddress, finalPort).then((server) {
       RouteMatch match;
 
       server.listen((HttpRequest request) {
