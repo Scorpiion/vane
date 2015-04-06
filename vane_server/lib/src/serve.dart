@@ -36,7 +36,7 @@ void serve({String address: _DEFAULT_ADDRESS,
     // Server port assignment
     var addressEnv = Platform.environment['ADDRESS'];
     var portEnv = Platform.environment['PORT'];
-    var finalAddress = portEnv != null ? int.parse(addressEnv) : address;
+    var finalAddress = addressEnv != null ? addressEnv : address;
     var finalPort = portEnv != null ? int.parse(portEnv) : port;
 
     Logger.root.info("Starting vane server: ${finalAddress}:${finalPort}");
