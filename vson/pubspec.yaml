@@ -1,5 +1,5 @@
 name: vson
-version: 0.6.6
+version: 0.7.0
 authors: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
 dependencies:
   logging: ">=0.9.3 <0.10.0"
