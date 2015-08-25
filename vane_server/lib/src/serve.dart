@@ -3,7 +3,7 @@
 part of vane;
 
 const String _DEFAULT_ADDRESS = "0.0.0.0";
-const int _DEFAULT_PORT       = 8080;
+const int _DEFAULT_PORT       = 9090;
 
 void serve({String address: _DEFAULT_ADDRESS,
             int port: _DEFAULT_PORT,

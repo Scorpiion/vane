@@ -122,7 +122,30 @@ class VaneModelMirror extends Object with VaneModelTypeCheck {
           // lists super interface. For reference on this usage please see
           // here on why we use superinterface[0]:
           // https://groups.google.com/a/dartlang.org/d/topic/misc/9ze4Cqn5iAc/discussion
-          instance = cm.superinterfaces[0].newInstance(new Symbol(''), []).reflectee;
+
+//          print("");
+//          print(cm.runtimeType);
+//          print(cm.superinterfaces);
+//          print(cm.superclass);
+//          print(cm.superclass.superinterfaces);
+//          print(cm.instanceMembers);
+//          print(cm.hasReflectedType);
+//          print(cm.typeArguments);
+//
+//          print("");
+//          print(cm.typeVariables[0].originalDeclaration);
+//          print(cm.typeVariables[0].owner);
+//          print(cm.typeVariables[0].qualifiedName);
+//          print(cm.typeVariables[0].upperBound);
+//          print(cm.typeVariables[0].typeArguments);
+//          print(cm.typeVariables[0].typeVariables);
+
+          instance = new List<Tag>();
+
+//          instance = cm.newInstance(new Symbol(''), []).reflectee;
+
+          // Old usage that no longer works
+//          instance = cm.superinterfaces[0].newInstance(new Symbol(''), []).reflectee;
         } else if(cm.isSubtypeOf(VMMS.typeMirrorMap) == true) {
           // Note: This "super climbing" is adapted for instansiation of a Map
           // of type "LinkedHashMap". Not sure what happends for the
@@ -238,5 +261,14 @@ class VaneModelMirrorMember extends Object with VaneModelTypeCheck {
       cm = reflectClass(tm.reflectedType);
     }
   }
+}
+
+class Tag extends VaneModel {
+  String tag;
+  bool selected;
+
+  Tag(this.tag, [this.selected = false]);
+
+  Tag.model();
 }
 

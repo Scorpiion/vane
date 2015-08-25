@@ -5,10 +5,41 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:mirrors';
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:vson/vson.dart';
 
+class Class1 extends VaneModel {
+  String name;
+  Class2 tag;
+
+  Class1.fromJson(Map json) {
+
+  }
+}
+
+const bool JsonEncodable = true;
+
+@JsonEncodable
+class Class2 extends VaneModel {
+  String data;
+
+  Class2.fromJson(Map json) {
+
+  }
+}
+
 void main() {
+  Class1 a = new Class1()
+    ..name = "Dart"
+    ..tag = new Class2();
+  a.tag.data = "lots of data";
+
+  Class1 b = VaneModel.decode(VaneModel.encode(a), new Class1());
+
+  print(b.tag.data);
+
+  return;
+
   test('1. VaneModel.encode(new SimpleModel("Dart", 100))', () {
     SimpleModel a = new SimpleModel("Dart", 100);
     SimpleModel b = VaneModel.decode('{"name":"Dart","age":100}', new SimpleModel.model());
@@ -53,11 +84,30 @@ void main() {
 
     expect(t1.name, equals(t2.name));
 
+
+
     for(var i = 0; i < t1.tags.length; i++) {
-      expect(t1.tags[i].tag, equals(t2.tags[i].tag));
-      expect(t1.tags[i].selected, equals(t2.tags[i].selected));
+
+//      print(t1.tags[i]);
+//      print(t1.tags[i].tag);
+//      print(t1.tags[i].selected);
+
+      print(t2.tags[i]);
+//      print(t2.tags[i].tag);
+//      print(t2.tags[i].selected);
+
+
+//      expect(t1.tags[i].tag, equals(t2.tags[i].tag));
+//      expect(t1.tags[i].selected, equals(t2.tags[i].selected));
     }
+
+//    for(var i = 0; i < t1.tags.length; i++) {
+//      expect(t1.tags[i].tag, equals(t2.tags[i].tag));
+//      expect(t1.tags[i].selected, equals(t2.tags[i].selected));
+//    }
   });
+
+  return;
 
   test('6. VaneModel.decode(VaneModel.encode())', () {
     var t1 = new MyTagClass()

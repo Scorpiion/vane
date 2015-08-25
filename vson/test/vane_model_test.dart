@@ -7,7 +7,7 @@ import 'dart:mirrors';
 
 import 'package:observe/observe.dart';
 
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 import 'package:vson/vson.dart';
 
 class SimpleModel extends VaneModel {

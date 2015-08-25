@@ -7,7 +7,6 @@ const int _NEXT_MIDDLEWARE = 2;
 const int _REDIRECT_RESPONSE = 3;
 
 class Vane {
-
   // ****************************************************
   // Experimental code, should not be commited...
   String view;
@@ -554,17 +553,17 @@ class Vane {
     var c = new Completer();
 
     // Upgrade connection to a websocket connection or parse the request body
-    if(WebSocketTransformer.isUpgradeRequest(_core.req._req)) {
+    if(WebSocketTransformer.isUpgradeRequest(_core.req.zRequest)) {
       // Setup websocket
       // Note: Other body dependent members can be ignored since websockets
       // are GET request only and they never have a body
-      WebSocketTransformer.upgrade(_core.req._req).then((conn) {
+      WebSocketTransformer.upgrade(_core.req.zRequest).then((conn) {
         _core.ws = conn;
         c.complete();
       });
     } else {
       // Parse body
-      HttpBodyHandler.processRequest(_core.req._req).then((parsedBody) {
+      HttpBodyHandler.processRequest(_core.req.zRequest).then((parsedBody) {
         switch(parsedBody.type) {
           case "json":
             _core.body = parsedBody;
@@ -618,7 +617,7 @@ class Vane {
       var data = UTF8.decode(_core.output._data.expand((e) => e).toList());
 
       if(data != null) {
-        _core.res._res.write(data);
+        _core.res.zResponse.write(data);
       }
     }
   }
@@ -929,13 +928,13 @@ class Vane {
       middle.then((res) {
         if(res == _CLOSE_RESPONSE) {
           // Close connection
-          _core.res._res.close();
+          _core.res.zResponse.close();
         } else if(res == _REDIRECT_RESPONSE) {
           // Redirect
-          _core.res._res.redirect(Uri.parse(_core.redirect_url), status: _core.redirect_status);
+          _core.res.zResponse.redirect(Uri.parse(_core.redirect_url), status: _core.redirect_status);
         } else {
           // Run registed postHook middleware, then close connection
-          _runMiddleware(_core, post).then((_) => _core.res._res.close());
+          _runMiddleware(_core, post).then((_) => _core.res.zResponse.close());
         }
       });
     });
@@ -965,10 +964,10 @@ class Vane {
     middle.then((res) {
       if(res == _CLOSE_RESPONSE) {
         // Close connection
-        _core.res._res.close();
+        _core.res.zResponse.close();
       } else if(res == _REDIRECT_RESPONSE) {
         // Redirect
-        _core.res._res.redirect(Uri.parse(_core.redirect_url), status: _core.redirect_status);
+        _core.res.zResponse.redirect(Uri.parse(_core.redirect_url), status: _core.redirect_status);
       } else {
         // Run registered postHook middleware, then complete with r
         _runMiddleware(_core, post).then((r) => c.complete(r));

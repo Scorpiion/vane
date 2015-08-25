@@ -38,3 +38,5 @@ part 'middleware/cors.dart';
 
 part 'src/parsers.dart';
 
+// Alternative package name ideas for http lib or server: vttp
+

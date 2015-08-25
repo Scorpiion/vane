@@ -6,10 +6,10 @@
 part of vane;
 
 class VaneRequest {
-  // Internal http request object
-  HttpRequest _req;
+  /// Underlying http request object
+  HttpRequest zRequest;
 
-  VaneRequest(this._req);
+  VaneRequest(this.zRequest);
 
   /**
    * The client certificate of the client making the request (read-only).
@@ -18,14 +18,14 @@ class VaneRequest {
    * or if the server does not request a client certificate, or if the client
    * does not provide one.
    */
-  X509Certificate get certificate => _req.certificate;
+  X509Certificate get certificate => zRequest.certificate;
 
   /**
    * Information about the client connection (read-only).
    *
    * Returns [:null:] if the socket is not available.
    */
-  HttpConnectionInfo get connectionInfo => _req.connectionInfo;
+  HttpConnectionInfo get connectionInfo => zRequest.connectionInfo;
 
   /**
    * The content length of the request body (read-only).
@@ -33,33 +33,33 @@ class VaneRequest {
    * If the size of the request body is not known in advance,
    * this value is -1.
    */
-  int get contentLength => _req.contentLength;
+  int get contentLength => zRequest.contentLength;
 
   /**
    * The cookies in the request, from the Cookie headers (read-only).
    */
-  List<Cookie> get cookies => _req.cookies;
+  List<Cookie> get cookies => zRequest.cookies;
 
   /**
    * The request headers (read-only).
    */
-  HttpHeaders get headers => _req.headers;
+  HttpHeaders get headers => zRequest.headers;
 
   /**
    * The method, such as 'GET' or 'POST', for the request (read-only).
    */
-  String get method => _req.method;
+  String get method => zRequest.method;
 
   /**
    * The persistent connection state signaled by the client (read-only).
    */
-  bool get persistentConnection => _req.persistentConnection;
+  bool get persistentConnection => zRequest.persistentConnection;
 
   /**
    * The HTTP protocol version used in the request,
    * either "1.0" or "1.1" (read-only).
    */
-  String get protocolVersion => _req.protocolVersion;
+  String get protocolVersion => zRequest.protocolVersion;
 
   /**
    * The requested URI for the request (read-only).
@@ -73,7 +73,7 @@ class VaneRequest {
    * To reconstruct the host, first 'X-Forwarded-Host' is checked, then 'Host'
    * and finally calling back to server.
    */
-  Uri get requestedUri => _req.requestedUri;
+  Uri get requestedUri => zRequest.requestedUri;
 
   /**
    * The URI for the request (read-only).
@@ -81,6 +81,6 @@ class VaneRequest {
    * This provides access to the
    * path, query string, and fragment identifier for the request.
    */
-  Uri get uri => _req.uri;
+  Uri get uri => zRequest.uri;
 }
 

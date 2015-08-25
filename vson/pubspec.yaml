@@ -1,12 +1,15 @@
 name: vson
 version: 0.7.0
-authors: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
+author: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
 dependencies:
-  logging: ">=0.9.3 <0.10.0"
-  constrain: ">=0.2.0+2 <0.3.0"
-  barback: ">=0.15.2+4 <0.16.0"
-  observe: ">=0.13.0+1 <0.14.0"
+  barback: '>=0.15.2+4 <0.16.0'
+  constrain: '>=0.2.0+2 <0.3.0'
+  logging: '>=0.9.3 <0.10.0'
+  observe: '>=0.13.0+1 <0.14.0'
+  test: any
 
-dev_dependencies:
-  unittest: ">=0.11.0+4 <0.12.0"
+  unittest: any
+  analyzer: any
+  dogma_data:
+    path: /home/robert/Workspace/dogma-data
 
