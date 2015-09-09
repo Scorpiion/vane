@@ -6,21 +6,115 @@ const int _CLOSE_RESPONSE = 1;
 const int _NEXT_MIDDLEWARE = 2;
 const int _REDIRECT_RESPONSE = 3;
 
+class _TemplateWatcher {
+  bool changed;
+  bool lazy;
+  String path;
+  String raw;
+  String output;
+  FileWatcher watcher;
+}
+
 class Vane {
   // ****************************************************
   // Experimental code, should not be commited...
   String view;
-  Future render(Object model) {
-    // Send data on to tube to next middleware handler
-    if(view == null) {
-      // Error bad view
+  String renderEngine = RENDER_MUSTACHE;
+
+  static Map<String, _TemplateWatcher> _templates = new Map<String, _TemplateWatcher>();
+
+  /// Renders [[view]] with render engine [[renderEngine]] and then executes
+  /// the next handler in the pipeline
+  Future render({String template: '', Object model: const{}, String renderEngine: RENDER_HTML}) async {
+    // Check that template and renderEngine is set
+    if(template == null || template == '') {
+      throw('Template missing');
     }
-    if(model == null) {
-      // Error bad model
+    if(renderEngine != RENDER_MUSTACHE && renderEngine != RENDER_COMMONMARK && renderEngine != RENDER_HTML) {
+      throw('Unsupported render engine "$renderEngine", supported render engines are $RENDER_MUSTACHE and $RENDER_COMMONMARK');
     }
 
-    return next([view, model]);
+    // Add new template to list of templates if already present
+    if(_templates.containsKey(template) == false) {
+      print("Adding new template: ${template}");
+
+      var templateWatcher = new _TemplateWatcher();
+
+      // Try to handle relative and absolute paths
+      if(libpath.isAbsolute(template) == true) {
+        templateWatcher.path = template;
+      } else if(libpath.isRelative(template) == true) {
+        templateWatcher.path = libpath.absolute(libpath.current, template);
+      } else {
+        throw('Bad template path "$template"');
+      }
+
+      // Read template file
+      templateWatcher.raw = await new File(templateWatcher.path).readAsString();
+
+      // Setup watcher for file changes
+      templateWatcher.watcher = new FileWatcher(templateWatcher.path);
+
+      templateWatcher.watcher.events.listen((WatchEvent e) async {
+        if(e.type == ChangeType.MODIFY) {
+          if(templateWatcher.lazy == true) {
+            templateWatcher.changed = true;
+          } else {
+            // Read updated template from disk
+            templateWatcher.raw = await new File(templateWatcher.path).readAsString();
+          }
+        }
+      });
+
+      // Change changed to true to trigger initial rendering of template
+      templateWatcher.changed = true;
+
+      // Save template object
+      _templates[template] = templateWatcher;
+    }
+
+    // Render template if it has changed
+    if(_templates[template].changed == true) {
+      // If the template is lazyly reread from disk, read from disk now (otherwise it's already done)
+      if(_templates[template].lazy == true) {
+        // Read updated template from disk
+        print('Reading template from disk: $template...');
+        _templates[template].raw = await new File(_templates[template].path).readAsString();
+      }
+
+      // Render html view (aka pass through html that don't need specific rendering)
+      if(renderEngine == RENDER_HTML) {
+        // Do nothing, only here to show that it's a valid option
+        print('Rendering html template: $template...');
+        _templates[template].output = _templates[template].raw;
+      }
+
+      // Render mustache view
+      if(renderEngine == RENDER_MUSTACHE) {
+        // Render mustache template
+        print('Rendering mustache template: $template...');
+        _templates[template].output = mustache.render(_templates[template].raw, model);
+      }
+
+      // Render commonmark view
+      if(renderEngine == RENDER_COMMONMARK) {
+        print('Rendering commonmark template: $template...');
+        md.Document doc = md.CommonMarkParser.defaults.parse(_templates[template].raw);  // TODO: Use 'view' as argument here..
+        _templates[template].output = md.HtmlWriter.defaults.write(doc);
+      }
+    }
+
+    // Set html as content type (utf-8 to override default latin1,
+    // needed for "smart punctation" that commonmark uses)
+    res.headers.contentType = new ContentType("text", "html", charset: "utf-8");
+
+    // Append rendered output to outgoing buffer
+    write(_templates[template].output);
+
+    // Send data on to tube to next middleware handler
+    return next();
   }
+
   // ****************************************************
 
   /// Vane core shared by the main handler and all middleware classes
@@ -871,7 +965,7 @@ class Vane {
     // Process request body
     _processRequest().then((_) {
       // Setup output stream
-      _core.iosink = new IOSink(_core.output);
+      _core.iosink = new IOSink(_core.output, encoding: UTF8);
 
       // Run init
       init();

@@ -14,6 +14,11 @@ import 'package:mongo_dart/mongo_dart.dart' show Db;
 import 'package:yaml/yaml.dart';
 import 'package:http/http.dart';
 
+import 'package:md_proc/md_proc.dart' as md;
+import 'package:mustache4dart/mustache4dart.dart' as mustache;
+import 'package:watcher/watcher.dart';
+import 'package:path/path.dart' as libpath;
+
 part 'src/req.dart';
 part 'src/res.dart';
 part 'src/vane_core.dart';
@@ -36,7 +41,7 @@ part 'src/serve.dart';
 part 'middleware/log.dart';
 part 'middleware/cors.dart';
 
-part 'src/parsers.dart';
+part 'src/renders.dart';
 
 // Alternative package name ideas for http lib or server: vttp
 
