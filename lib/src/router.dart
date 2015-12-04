@@ -30,7 +30,7 @@ class Router {
 
   RouteMatch matchRequest(HttpRequest request) {
     RouteMatch match = new RouteMatch();
-    _VaneRoute matchedRoute;
+//    _VaneRoute matchedRoute;
 
     // Check request uri against routes
     for(var route in routes) {

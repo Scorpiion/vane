@@ -50,7 +50,7 @@ List<_VaneRoute> generateClientRoutes() {
         // Setup podo controllers
         var mirror = VaneClientProxyMirror.type;
         String controller;
-        Route baseMetaRoute;
+//        Route baseMetaRoute;
 
         Logger.root.fine("Adding routes for podo controller: ${realname(mirror)}");
 
@@ -96,7 +96,7 @@ List<_VaneRoute> generateClientRoutes() {
         // Setup podo controllers
         var mirror = VaneClientProxyMirror.type;
         String controller;
-        Route baseMetaRoute;
+//        Route baseMetaRoute;
 
         Logger.root.fine("Adding routes for podo controller: ${realname(mirror)}");
 

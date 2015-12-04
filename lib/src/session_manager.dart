@@ -34,8 +34,8 @@ String MONGODB_URI = _MONGODB_URI != null ? _MONGODB_URI : "mongodb://localhost:
 ///
 class _SessionManager {
   Map<String, _Session> pool = new Map<String, _Session>();
-  var _coreMongodbPoolMax = 4;
-  var _connCount = 0;
+//  var _coreMongodbPoolMax = 4;
+//  var _connCount = 0;
   String _uri;
   int _session_update;
 
@@ -97,7 +97,7 @@ class _SessionManager {
     // Check if any sessions have timed out
     pool.forEach((session, data) {
       Duration diff = now.difference(data.lastUsed);
-      Duration diff2 = data.lastUsed.difference(now);
+//      Duration diff2 = data.lastUsed.difference(now);
 
       // If session has not been used within [SESSION_TIMEOUT] minutes, remove it
       if(diff.inMinutes >= data.timeout) {

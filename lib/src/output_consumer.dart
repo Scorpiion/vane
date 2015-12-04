@@ -5,17 +5,17 @@ part of vane;
 class _OutputConsumer<S> implements StreamConsumer<S> {
   Completer _c = new Completer();
   List<S> _data;
-  int _length;
+//  int _length;
   StreamSubscription _sub;
 
   Future<S> addStream(Stream<S> stream) {
     _sub = stream.listen(null);
     _data = <S>[];
-    _length = 0;
+//    _length = 0;
 
     _sub.onData((data) {
       _data.add(data);
-      _length += data.length;
+//      _length += data.length;
     });
 
     _sub.onError((err) {

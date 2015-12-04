@@ -11,13 +11,13 @@ _Middlewares parsePipeline(ClassMirror controllerMirror) {
   ClassMirror VaneMirror = reflectClass(Vane);
   var middlewares = new _Middlewares();
 
-  bool pipelineDeclared = false;
+//  bool pipelineDeclared = false;
   bool foundThis = false;
 
   for(var vMirror in controllerMirror.declarations.values.where((mirror)
           => mirror is VariableMirror)) {
     if(vMirror.simpleName == new Symbol("pipeline")) {
-      pipelineDeclared = true;
+//      pipelineDeclared = true;
 
       // Create instance
       var controller = controllerMirror.newInstance(new Symbol(""), []);
