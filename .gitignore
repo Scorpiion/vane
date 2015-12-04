@@ -2,4 +2,6 @@ pubspec.lock
 packages
 docs
 .pub
+.idea/
+
 
