@@ -1,4 +1,9 @@
 
+### 0.8.0
+
+* Revering back to single package structure.
+* New feature: server side rendering of templates .
+
 ### 0.7.0
 
 * First version as a seperate package, vane is being splitted up into multiple packages.

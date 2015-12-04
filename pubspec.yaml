@@ -1,5 +1,5 @@
 name: vane_server
-version: 0.7.0
+version: 0.8.0
 author: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
 dependencies:
   http: ">=0.11.1+3 <0.12.0"
@@ -8,10 +8,7 @@ dependencies:
   mongo_dart: ">=0.1.46 <0.2.0"
   uri: ">=0.9.5 <0.12.0"
   yaml: ">=2.1.2 <3.0.0"
-
-
   mustache4dart: '>= 1.0.0 < 2.0.0'
   md_proc: "^0.7.0"
   watcher: "^0.9.7"
-  path: any
 
