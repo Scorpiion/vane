@@ -25,11 +25,22 @@ class Vane {
 
   /// Renders [[view]] with render engine [[renderEngine]] and then executes
   /// the next handler in the pipeline
-  Future render({String template: '', Object model: const{}, String renderEngine: RENDER_HTML}) async {
+  Future render({String template: '', Object model: const{}, String renderEngine: ''}) async {
     // Check that template and renderEngine is set
     if(template == null || template == '') {
       throw('Template missing');
     }
+
+    // Try to detect render engine if needed
+    if(renderEngine == '') {
+      if(template.endsWith(".md")) {
+        renderEngine = RENDER_COMMONMARK;
+      } else if(template.endsWith(".html")) {
+        renderEngine = RENDER_MUSTACHE;
+      }
+    }
+
+    // Check that we have a render engine setup
     if(renderEngine != RENDER_MUSTACHE && renderEngine != RENDER_COMMONMARK && renderEngine != RENDER_HTML) {
       throw('Unsupported render engine "$renderEngine", supported render engines are $RENDER_MUSTACHE and $RENDER_COMMONMARK');
     }
