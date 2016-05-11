@@ -1,4 +1,8 @@
 
+### 0.8.1
+
+* Added so render engine for server side template rendering is autodetected when not specified.
+
 ### 0.8.0
 
 * Revering back to single package structure.
