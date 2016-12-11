@@ -1,3 +1,6 @@
+### 0.8.2
+
+* Bugfix to handle empty requests with "Content-Type: application/json".
 
 ### 0.8.1
 

@@ -667,27 +667,31 @@ class Vane {
         c.complete();
       });
     } else {
-      // Parse body
-      HttpBodyHandler.processRequest(_core.req.zRequest).then((parsedBody) {
-        switch(parsedBody.type) {
-          case "json":
-            _core.body = parsedBody;
-            _core.json = parsedBody.body;
-            break;
-          case "form":
-            _core.body = parsedBody;
-            _core.params = parsedBody.body;
-            _core.files = parsedBody.body;
-            break;
-          default:
-            _core.body = parsedBody;
-            break;
-        }
+      // Parse body (if not empty)
+      if(_core.req.contentLength > 0) {
+        HttpBodyHandler.processRequest(_core.req.zRequest).then((parsedBody) {
+          switch(parsedBody.type) {
+            case "json":
+              _core.body = parsedBody;
+              _core.json = parsedBody.body;
+              break;
+            case "form":
+              _core.body = parsedBody;
+              _core.params = parsedBody.body;
+              _core.files = parsedBody.body;
+              break;
+            default:
+              _core.body = parsedBody;
+              break;
+          }
 
-        // Complete future to signal that the proessing is finished and that
-        // the parsed members are ready to be used
+          // Complete future to signal that the proessing is finished and that
+          // the parsed members are ready to be used
+          c.complete();
+        });
+      } else {
         c.complete();
-      });
+      }
     }
 
     return c.future;
