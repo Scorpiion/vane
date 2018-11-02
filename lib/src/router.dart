@@ -22,7 +22,7 @@ class Router {
     routes.addAll(generateClientRoutes());
 
     // Sort routes
-    routes.sort();
+    routes.sort((a, b) => a.metaRoute.path.split("/").length.compareTo(b.metaRoute.path.split("/").length));
 
     // Reverse list so that the longest paths comes first
     routes = new List.from(routes.reversed);
