@@ -7,8 +7,7 @@ class _VaneCore {
   Map params;
   Map<String, dynamic> files;
   WebSocket ws;
-  _OutputConsumer output = new _OutputConsumer();
-  IOSink iosink;
+  BytesBuilder output = new BytesBuilder();
 
   /// Internal variables used for redirect
   String redirect_url;

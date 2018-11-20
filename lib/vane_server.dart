@@ -8,13 +8,13 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:mirrors';
 import 'package:uri/uri.dart';
-import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler, VirtualDirectory;
+import 'package:http_server/http_server.dart' show HttpRequestBody, HttpBodyHandler;
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/mongo_dart.dart' show Db;
 import 'package:yaml/yaml.dart';
 import 'package:http/http.dart';
 
-import 'package:md_proc/md_proc.dart' as md;
+import 'package:markdown/markdown.dart';
 import 'package:mustache4dart/mustache4dart.dart' as mustache;
 import 'package:watcher/watcher.dart';
 import 'package:path/path.dart' as libpath;
@@ -24,7 +24,6 @@ part 'src/res.dart';
 part 'src/vane_core.dart';
 part 'src/vane.dart';
 part 'src/session_manager.dart';
-part 'src/output_consumer.dart';
 part 'src/tube.dart';
 
 part 'src/annotations.dart';

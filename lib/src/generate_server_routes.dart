@@ -34,8 +34,7 @@ List<_VaneRoute> generateServerRoutes(Controllers controllers) {
     // Create a new route object for each handler method (better for runtime
     // performance to give each handler their own route object since it makes
     // matching easier)
-    for(var method in mirror.declarations.values.where((method)
-        => method is MethodMirror && method.isRegularMethod)) {
+    for(MethodMirror method in mirror.declarations.values.where((method) => method is MethodMirror && method.isRegularMethod)) {
       // Check if the method have a @Route annotation
       if(method.metadata.any((meta) => meta.reflectee is Route) == true) {
         for(var meta in method.metadata) {
@@ -86,7 +85,7 @@ List<_VaneRoute> generateServerRoutes(Controllers controllers) {
     // Create a new route object for each handler method (better for runtime
     // performance to give each handler their own route object since it makes
     // matching easier)
-    for(var method in mirror.declarations.values.where((method)
+    for(MethodMirror method in mirror.declarations.values.where((method)
         => method is MethodMirror && method.isRegularMethod)) {
       // Check if the method have a @Route annotation
       if(method.metadata.any((meta) => meta.reflectee is Route) == true) {

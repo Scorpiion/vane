@@ -18,7 +18,7 @@ class _VaneRoute extends Comparable {
   ClassMirror classMirror;
   MethodMirror funcMirror;
 
-  int compareTo(_VaneRoute other) {
+  int compareTo(other) {
     // Here we use String.compareTo() as a base for our compareTo(). We extend
     // it by replacing "{" with "!" ("!" in particular because of it's low ascii
     // representation, it is below a-z and 0-9 while "{" is above and hence

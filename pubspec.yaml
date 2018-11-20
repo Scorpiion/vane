@@ -3,16 +3,17 @@ version: 0.8.2+1
 author: Robert Åkerblom-Andersson <Robert.nr1@gmail.com>
 description: Server-side framework for Dart/Dartlang with a built-in middleware system
 homepage: https://github.com/Scorpiion/vane
-dependencies:
-  http: ">=0.11.1+3 <0.12.0"
-  http_server: ">=0.9.5+1 <0.10.0"
-  logging: ">=0.11.0 <0.12.0"
-  mongo_dart: ">=0.2.0 <0.3.0"
-  uri: ">=0.9.5 <0.12.0"
-  yaml: ">=2.1.2 <3.0.0"
-  mustache4dart: '>= 1.0.0 < 2.0.0'
-  md_proc: ">= 0.7.0 < 0.8.0"
-  watcher: ">= 0.9.7 < 0.10.0"
 
 environment:
-  sdk: ">=1.9.0 <2.0.0"
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  http: ^0.12.0
+  http_server: ^0.9.8+1
+  logging: ^0.11.3+2
+  mongo_dart: ^0.3.3
+  uri: ^0.11.3+1
+  yaml: ^2.1.15
+  mustache4dart: ^3.0.0-dev.1.0
+  markdown: ^2.0.2
+  watcher: ^0.9.7+10

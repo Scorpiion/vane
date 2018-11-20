@@ -26,8 +26,8 @@ abstract class Tube {
   /// If [cancelOnError] is true, the subscription is ended when
   /// the first error is reported. The default is false.
   ///
-  StreamSubscription listen(void onData(String line),
-                            { void onError(Error error),
+  StreamSubscription listen(void onData(line),
+                            { Function onError,
                               void onDone(),
                               bool cancelOnError });
 
@@ -83,8 +83,8 @@ class _TubeImpl extends Stream implements Tube {
   Queue _fifo = new Queue();
 
   // Forward stream's listen function
-  StreamSubscription listen(void onData(String line),
-                            { void onError(Error error),
+  StreamSubscription listen(void onData(line),
+                            { Function onError,
                               void onDone(),
                               bool cancelOnError }) {
     return _base.stream.listen(onData,

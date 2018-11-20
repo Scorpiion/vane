@@ -54,7 +54,7 @@ class VaneResponse {
    * Gets and sets the status code. Any integer value is accepted. For
    * the official HTTP status codes use the fields from
    * [HttpStatus]. If no status code is explicitly set the default
-   * value [HttpStatus.OK] is used.
+   * value [HttpStatus.ok] is used.
    */
   int get statusCode => zResponse.statusCode;
   void set statusCode(int _statusCode) {

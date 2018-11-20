@@ -110,8 +110,13 @@ class Vane {
       // Render commonmark view
       if(renderEngine == RENDER_COMMONMARK) {
         print('Rendering commonmark template: $template...');
-        md.Document doc = md.CommonMarkParser.defaults.parse(_templates[template].raw);  // TODO: Use 'view' as argument here..
-        _templates[template].output = md.HtmlWriter.defaults.write(doc);
+
+
+        // NOTE: "markdownToHtml()" is untested here, we used a different
+        // package here before Dart 2.0
+        _templates[template].output = markdownToHtml(_templates[template].raw);
+
+
       }
     }
 
@@ -700,30 +705,36 @@ class Vane {
   /// Converts [obj] to a String by invoking [Object.toString] and
   /// adds the result to `this`.
   void write(Object data) {
-    _core.iosink.write(data);
+    _core.output.add(data.toString().codeUnits);
   }
 
   /// Iterates over the given [objects] and [write]s them in sequence.
   void writeAll(Iterable objects, [String separator = ""]) {
-    _core.iosink.writeAll(objects, separator);
+    for (var object in objects) {
+      _core.output.add(object.toString().codeUnits);
+      if (separator != "") {
+        _core.output.add(separator.codeUnits);
+      }
+    }
   }
 
   /// Writes the [charCode] to output.
   ///
   /// This method is equivalent to `write(new String.fromCharCode(charCode))`.
   void writeCharCode(int charCode) {
-    _core.iosink.writeCharCode(charCode);
+    _core.output.add(new String.fromCharCode(charCode).codeUnits);
   }
 
   /// Write object followed by a newline to output stream
   void writeln([Object data = ""]) {
-    _core.iosink.writeln(data);
+    _core.output.add(data.toString().codeUnits);
+    _core.output.add("\n".codeUnits);
   }
 
   /// Flush data written with [write] and [writeln]
   void flush() {
-    if(_core.output._data != null) {
-      var data = UTF8.decode(_core.output._data.expand((e) => e).toList());
+    if(_core.output.isNotEmpty) {
+      var data = utf8.decode(_core.output.toBytes());
 
       if(data != null) {
         _core.res.zResponse.write(data);
@@ -752,7 +763,7 @@ class Vane {
   /// Test url:
   ///     curl -v 'http://[appname].[user].dartblob.com/[handler]?url=https://www.dartlang.org/'
   ///
-  Future redirect(String url, {int status: HttpStatus.MOVED_TEMPORARILY}) {
+  Future redirect(String url, {int status: HttpStatus.movedTemporarily}) {
     // Set internal redirect variables
     _core.redirect_url = url;
     _core.redirect_status = status;
@@ -846,9 +857,9 @@ class Vane {
         // JSON encode the data if it is of type List or Map, else write it as it is
         if(data is Map || data is List) {
           _core.res.headers.contentType = new ContentType("application", "json");
-          _core.iosink.write(JSON.encode(data));
+          _core.output.add(json.encode(data).toString().codeUnits);
         } else {
-          _core.iosink.write(data);
+          _core.output.add(data.toString().codeUnits);
         }
       } else {
         // Set provided content type
@@ -856,9 +867,9 @@ class Vane {
 
         // JSON encode the data if it is of type List or Map, else write it as it is
         if(data is Map || data is List) {
-          _core.iosink.write(JSON.encode(data));
+          _core.output.add(json.encode(data).toString().codeUnits);
         } else {
-          _core.iosink.write(data);
+          _core.output.add(data.toString().codeUnits);
         }
       }
     }
@@ -958,7 +969,7 @@ class Vane {
     flush();
 
     // Close output stream
-    _core.iosink.close();
+//    _core.output.close();
 
     // Complete future
     // (iosink.close should return a future but don't seem to do so...)
@@ -979,9 +990,6 @@ class Vane {
 
     // Process request body
     _processRequest().then((_) {
-      // Setup output stream
-      _core.iosink = new IOSink(_core.output, encoding: UTF8);
-
       // Run init
       init();
 

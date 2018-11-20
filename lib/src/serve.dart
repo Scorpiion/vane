@@ -52,7 +52,7 @@ void serve({String address: _DEFAULT_ADDRESS,
           router.serve(request, match);
         } else {
           Logger.root.warning("Could not find any handler matching path: ${request.uri.path}");
-          request.response.statusCode = HttpStatus.NOT_FOUND;
+          request.response.statusCode = HttpStatus.notFound;
           request.response.close();
         }
       });
