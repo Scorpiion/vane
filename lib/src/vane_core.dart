@@ -3,7 +3,7 @@
 part of vane;
 
 class _VaneCore {
-  dynamic json;
+  dynamic j;
   Map params;
   Map<String, dynamic> files;
   WebSocket ws;

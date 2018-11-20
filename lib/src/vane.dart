@@ -162,9 +162,9 @@ class Vane {
   /// [:VaneRequest:] contains a subset of the [:HttpRequest:] objects parameters
   /// were some parts has been moved to top level in Vane such as parts
   /// regarding the body of the request that is available as easy to use objects
-  /// such as [session], [body], [json] and [params].
+  /// such as [session], [body], [j] (json) and [params].
   ///
-  /// For examples please see [session], [body], [json] and [params].
+  /// For examples please see [session], [body], [j] and [params].
   ///
   VaneRequest get req => _core.req;
 
@@ -509,11 +509,11 @@ class Vane {
   ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' "http://localhost:9090/"
   ///
   dynamic get json {
-    if(_core.json == null) {
-      _core.json = new Map();
+    if(_core.j == null) {
+      _core.j = new Map();
     }
 
-    return _core.json;
+    return _core.j;
   }
 
   /// Parsed files
@@ -678,7 +678,7 @@ class Vane {
           switch(parsedBody.type) {
             case "json":
               _core.body = parsedBody;
-              _core.json = parsedBody.body;
+              _core.j = parsedBody.body;
               break;
             case "form":
               _core.body = parsedBody;
