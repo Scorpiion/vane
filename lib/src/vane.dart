@@ -508,7 +508,7 @@ class Vane {
   /// Test url:
   ///     curl -H "Content-Type: application/json" --data '{"name": "world"}' "http://localhost:9090/"
   ///
-  dynamic get json {
+  dynamic get j {
     if(_core.j == null) {
       _core.j = new Map();
     }
