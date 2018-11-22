@@ -734,7 +734,7 @@ class Vane {
   /// Flush data written with [write] and [writeln]
   void flush() {
     if(_core.output.isNotEmpty) {
-      var data = utf8.decode(_core.output.toBytes());
+      var data = utf8.decode(_core.output.toBytes(), allowMalformed: true);
 
       if(data != null) {
         _core.res.zResponse.write(data);
