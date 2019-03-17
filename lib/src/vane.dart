@@ -705,15 +705,15 @@ class Vane {
   /// Converts [obj] to a String by invoking [Object.toString] and
   /// adds the result to `this`.
   void write(Object data) {
-    _core.output.add(data.toString().codeUnits);
+    _core.output.add(utf8.encode(data.toString()));
   }
 
   /// Iterates over the given [objects] and [write]s them in sequence.
   void writeAll(Iterable objects, [String separator = ""]) {
     for (var object in objects) {
-      _core.output.add(object.toString().codeUnits);
+      _core.output.add(utf8.encode(object.toString()));
       if (separator != "") {
-        _core.output.add(separator.codeUnits);
+        _core.output.add(utf8.encode(separator));
       }
     }
   }
@@ -722,13 +722,13 @@ class Vane {
   ///
   /// This method is equivalent to `write(new String.fromCharCode(charCode))`.
   void writeCharCode(int charCode) {
-    _core.output.add(new String.fromCharCode(charCode).codeUnits);
+    _core.output.add(utf8.encode(new String.fromCharCode(charCode)));
   }
 
   /// Write object followed by a newline to output stream
   void writeln([Object data = ""]) {
-    _core.output.add(data.toString().codeUnits);
-    _core.output.add("\n".codeUnits);
+    _core.output.add(utf8.encode(data.toString()));
+    _core.output.add(utf8.encode("\n"));
   }
 
   /// Flush data written with [write] and [writeln]
@@ -857,9 +857,9 @@ class Vane {
         // JSON encode the data if it is of type List or Map, else write it as it is
         if(data is Map || data is List) {
           _core.res.headers.contentType = new ContentType("application", "json");
-          _core.output.add(json.encode(data).toString().codeUnits);
+          _core.output.add(utf8.encode(json.encode(data).toString()));
         } else {
-          _core.output.add(data.toString().codeUnits);
+          _core.output.add(utf8.encode(data.toString()));
         }
       } else {
         // Set provided content type
@@ -867,9 +867,9 @@ class Vane {
 
         // JSON encode the data if it is of type List or Map, else write it as it is
         if(data is Map || data is List) {
-          _core.output.add(json.encode(data).toString().codeUnits);
+          _core.output.add(utf8.encode(json.encode(data).toString()));
         } else {
-          _core.output.add(data.toString().codeUnits);
+          _core.output.add(utf8.encode(data.toString()));
         }
       }
     }
